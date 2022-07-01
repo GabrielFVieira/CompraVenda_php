@@ -1,0 +1,26 @@
+{
+	"name": "gabrielfvieira/compra-venda_php",
+	"description": "A PHP Web project made during college",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"App\\": "App/"
+		},
+		"files": [
+			"App/Core/Config.php"
+		]
+	},
+	"authors": [
+		{
+			"name": "Gabriel Figueiredo",
+			"email": "gabrielfigueiredov@gmail.com"
+		}
+	],
+	"minimum-stability": "stable",
+	"require": {
+		"php": "^7.3",
+		"ext-pdo": "*",
+		"wixel/gump": "^1.12",
+		"coffeecode/router": "1.0.*"
+	}
+}
