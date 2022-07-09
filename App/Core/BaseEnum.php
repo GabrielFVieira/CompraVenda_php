@@ -29,10 +29,12 @@ namespace App\Core;
  *     DayOfWeek::toString(DayOfWeek::Tuesday)          // (string) "Tuesday"
  *     DayOfWeek::toString(5)                           // (string) "Friday"
  **/
-abstract class BaseEnum {
+abstract class BaseEnum
+{
     private static $constCacheArray = NULL;
 
-    private static function getConstants() {
+    private static function getConstants()
+    {
         if (self::$constCacheArray == NULL) {
             self::$constCacheArray = [];
         }
@@ -44,7 +46,8 @@ abstract class BaseEnum {
         return self::$constCacheArray[$calledClass];
     }
 
-    public static function isValidName($name, $strict = false) {
+    public static function isValidName($name, $strict = false)
+    {
         $constants = self::getConstants();
 
         if ($strict) {
@@ -55,8 +58,28 @@ abstract class BaseEnum {
         return in_array(strtolower($name), $keys);
     }
 
-    public static function isValidValue($value, $strict = true) {
+    public static function isValidValue($value, $strict = true)
+    {
         $values = array_values(self::getConstants());
         return in_array($value, $values, $strict);
+    }
+
+    public static function fromString($name)
+    {
+        if (self::isValidName($name, $strict = true)) {
+            $constants = self::getConstants();
+            return $constants[$name];
+        }
+
+        return false;
+    }
+
+    public static function toString($value)
+    {
+        if (self::isValidValue($value, $strict = true)) {
+            return array_search($value, self::getConstants());
+        }
+
+        return "";
     }
 }

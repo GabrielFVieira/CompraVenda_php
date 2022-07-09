@@ -2,15 +2,6 @@
 
 namespace App\models;
 
-use App\Core\BaseEnum;
-
-class Papel extends BaseEnum
-{
-    const Administradpr = "0";
-    const Vendedor      = "1";
-    const Comprador     = "2";
-}
-
 class Employee
 {
     private $id, $nome, $cpf, $senha, $papel;
@@ -19,9 +10,8 @@ class Employee
     {
         $this->id = 0;
         $this->nome = "";
-        $this->cpf= "";
+        $this->cpf = "";
         $this->senha = "";
-        $this->hashid = "";
         $this->papel = "";
     }
 
@@ -32,15 +22,6 @@ class Employee
     public function setId($id)
     {
         $this->id = $id;
-    }
-    /******************* */
-    public function getHashId()
-    {
-        return $this->hashid;
-    }
-    public function setHashId($hashid)
-    {
-        $this->hashid = $hashid;
     }
     /******************* */
     public function getNome()
@@ -81,8 +62,13 @@ class Employee
         return $this->papel;
     }
 
-    public function setPapel(Papel $papel)
+    public function setPapel($papel)
     {
         $this->papel = $papel;
+    }
+
+    public function getPapelString()
+    {
+        return Role::toString($this->papel);
     }
 }

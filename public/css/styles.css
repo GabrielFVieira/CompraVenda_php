@@ -2,3 +2,18 @@ html,
 body {
 	overflow: auto;
 }
+
+.error-msg {
+	font-size: 0.8rem;
+	position: absolute !important;
+	padding-right: 30px;
+	width: 100%;
+}
+
+.error-msg label {
+	overflow: hidden;
+	overflow-wrap: break-word;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+}

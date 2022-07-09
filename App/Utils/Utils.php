@@ -6,10 +6,10 @@ class Utils
 {
     public static function gerarCaptcha()
     {
-      // gerar a sequencia aleatória
-      $random_num = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
-      $captcha_code  = substr($random_num, 0, 5); // usa apenas os 5 primeiros caracteres
-      return $captcha_code;
+        // gerar a sequencia aleatória
+        $random_num = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+        $captcha_code  = substr($random_num, 0, 5); // usa apenas os 5 primeiros caracteres
+        return $captcha_code;
     }
 
 
@@ -18,7 +18,7 @@ class Utils
         $nome_imagem  = random_int(10000, 9999999); // usa apenas os 5 primeiros caracteres
 
         // cria uma imagem a partir de template_cap.jpg
-        $imagem = imagecreatefromjpeg(DIR_IMG_CAPTCHA. 'template_cap.jpg');
+        $imagem = imagecreatefromjpeg(DIR_IMG_CAPTCHA . 'template_cap.jpg');
         $cor_texto = imagecolorallocate($imagem, 0, 0, 0); // cria cor do captcha_code
 
         // inserir o captcha_code na imagem usando cor do texto e fontes TrueType
@@ -47,7 +47,7 @@ class Utils
         $string_aleatoria = bin2hex(openssl_random_pseudo_bytes(16));
         return hash_hmac('sha256', $string_aleatoria, CSRF_TOKEN_SECRET);
     }
-    
+
     public static function validarTokenCSRF($token_crsf, $token_session)
     {
         $token_crsf_original = $token_session;
@@ -59,7 +59,7 @@ class Utils
 
     public static function redirect($rota = "")
     {
-       header("Location:" . BASE_URL . "/". $rota);
+        header("Location:" . BASE_URL . "/" . $rota);
     }
 
     public static function usuarioLogado()
@@ -67,7 +67,7 @@ class Utils
         return isset($_SESSION['id']) && isset($_SESSION['nomeUsuario']);
     }
 
-    public static function setMessagem($mensagem, $title="Sucesso", $icon="success")
+    public static function setMessagem($mensagem, $title = "Sucesso", $icon = "success")
     {
         $_SESSION['mensagem'] = $mensagem;
         $_SESSION['title'] = $title;
@@ -80,6 +80,16 @@ class Utils
         unset($_SESSION['mensagem']);
         unset($_SESSION['title']);
         unset($_SESSION['icon']);
+    }
 
+    public static function generateRandomString($length = 15)
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++)
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+
+        return $randomString;
     }
 }

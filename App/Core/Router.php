@@ -10,7 +10,6 @@ $route->namespace("App\Controllers");
 /**
  * Public Area
  */
-$route->get("/", "DashboardController:index"); // Dashboard page
 $route->get("/login", "AccessController:index"); // Login page
 $route->post("/login", "AccessController:login"); // Login endpoint
 
@@ -18,7 +17,8 @@ $route->post("/login", "AccessController:login"); // Login endpoint
  * Private Area
  */
 
-// $route->get("/logout", "AccessController:logout"); // Logout endpoint
+$route->get("/", "DashboardController:index"); // Dashboard page
+$route->get("/logout", "AccessController:logout"); // Logout endpoint
 
 // $route->get("/customers", "Customer:index");
 // $route->post("/customers", "Customer:create");
