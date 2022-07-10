@@ -3,7 +3,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
-    <div>
+    <div class="vh-100 p-4 d-flex flex-column">
         <?php
             if ($_SESSION['papelUsuario'] == "Comprador") {
             ?>
@@ -13,50 +13,52 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         <?php
             }
             ?>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Produto</th>
-                    <th scope="col">Fornecedor</th>
-                    <th scope="col">Vendedor</th>
-                    <th scope="col">Data Compra</th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Valor Un.</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                    if (isset($data['purchases'])) {
-                        foreach ($data['purchases'] as $purchase) {
-                            $date = date_create($purchase['data_compra']);
-                    ?>
-                <tr>
-                    <td><?= $purchase['nome_produto'] ?></td>
-                    <td><?= $purchase['fornecedor'] ?></td>
-                    <td><?= $purchase['nome_funcionario'] ?></td>
-                    <td><?= date_format($date, 'd/m/Y') ?></td>
-                    <td><?= $purchase['quantidade_compra'] ?></td>
-                    <td>R$<?= $purchase['valor_compra'] ?></td>
-                    <td>
-                        <?php
-                                    if ($purchase['id_funcionario'] == $_SESSION['id']) {
-                                    ?>
-                        <button type="button" id="btnEdit" data-id="<?= $purchase['id'] ?>"
-                            class="btn btn-outline-primary">Editar</button>
-                        <button type="button" id="btnDelete" data-id="<?= $purchase['id'] ?>"
-                            class="btn btn-outline-danger">Remover</button>
-                        <?php
-                                    }
-                                    ?>
-                    </td>
-                </tr>
-                <?php
+        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Produto</th>
+                        <th scope="col">Fornecedor</th>
+                        <th scope="col">Vendedor</th>
+                        <th scope="col">Data Compra</th>
+                        <th scope="col">Quantidade</th>
+                        <th scope="col">Valor Un.</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        if (isset($data['purchases'])) {
+                            foreach ($data['purchases'] as $purchase) {
+                                $date = date_create($purchase['data_compra']);
+                        ?>
+                    <tr>
+                        <td><?= $purchase['nome_produto'] ?></td>
+                        <td><?= $purchase['fornecedor'] ?></td>
+                        <td><?= $purchase['nome_funcionario'] ?></td>
+                        <td><?= date_format($date, 'd/m/Y') ?></td>
+                        <td><?= $purchase['quantidade_compra'] ?></td>
+                        <td>R$<?= $purchase['valor_compra'] ?></td>
+                        <td>
+                            <?php
+                                        if ($purchase['id_funcionario'] == $_SESSION['id']) {
+                                        ?>
+                            <button type="button" id="btnEdit" data-id="<?= $purchase['id'] ?>"
+                                class="btn btn-outline-primary">Editar</button>
+                            <button type="button" id="btnDelete" data-id="<?= $purchase['id'] ?>"
+                                class="btn btn-outline-danger">Remover</button>
+                            <?php
+                                        }
+                                        ?>
+                        </td>
+                    </tr>
+                    <?php
+                            }
                         }
-                    }
-                    ?>
-            </tbody>
-        </table>
+                        ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

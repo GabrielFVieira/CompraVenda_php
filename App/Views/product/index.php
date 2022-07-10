@@ -24,7 +24,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
-    <div>
+    <div class="vh-100 p-4 d-flex flex-column">
         <?php
             if ($_SESSION['papelUsuario'] == "Comprador") {
             ?>
@@ -34,45 +34,53 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         <?php
             }
             ?>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Descrição</th>
-                    <th scope="col">Preço Compra</th>
-                    <th scope="col">Preço Venda</th>
-                    <th scope="col">Quantidade Disponível</th>
-                    <th scope="col">Categoria</th>
-                    <th scope="col">Liberado</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                    if (isset($data['products'])) {
-                        foreach ($data['products'] as $product) {
-                    ?>
-                <tr>
-                    <td><?= $product['nome_produto'] ?></td>
-                    <td><?= $product['descricao'] ?></td>
-                    <td>R$<?= $product['preco_compra'] ?></td>
-                    <td>R$<?= $product['preco_venda'] ?></td>
-                    <td><?= $product['quantidade_disponível'] ?></td>
-                    <td><?= $product['nome_categoria'] ?></td>
-                    <td><?= $product['liberado_venda'] ?></td>
-                    <td>
-                        <button type="button" id="btnEdit" data-id="<?= $product['id'] ?>"
-                            class="btn btn-outline-primary">Editar</button>
-                        <button type="button" id="btnDelete" data-id="<?= $product['id'] ?>"
-                            class="btn btn-outline-danger">Remover</button>
-                    </td>
-                </tr>
-                <?php
+        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Descrição</th>
+                        <th scope="col">Preço Compra</th>
+                        <th scope="col">Preço Venda</th>
+                        <th scope="col">Quantidade Disponível</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Liberado</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        if (isset($data['products'])) {
+                            foreach ($data['products'] as $product) {
+                        ?>
+                    <tr>
+                        <td><?= $product['nome_produto'] ?></td>
+                        <td><?= $product['descricao'] ?></td>
+                        <td>R$<?= $product['preco_compra'] ?></td>
+                        <td>R$<?= $product['preco_venda'] ?></td>
+                        <td><?= $product['quantidade_disponível'] ?></td>
+                        <td><?= $product['nome_categoria'] ?></td>
+                        <td><?= $product['liberado_venda'] ?></td>
+                        <td>
+                            <?php
+                                        if ($_SESSION['papelUsuario'] == "Comprador") {
+                                        ?>
+                            <button type="button" id="btnEdit" data-id="<?= $product['id'] ?>"
+                                class="btn btn-outline-primary">Editar</button>
+                            <button type="button" id="btnDelete" data-id="<?= $product['id'] ?>"
+                                class="btn btn-outline-danger">Remover</button>
+                            <?php
+                                        }
+                                        ?>
+                        </td>
+                    </tr>
+                    <?php
+                            }
                         }
-                    }
-                    ?>
-            </tbody>
-        </table>
+                        ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

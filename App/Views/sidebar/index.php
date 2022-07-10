@@ -1,8 +1,5 @@
 <div id="sidebar" class="vh-100 py-4 pl-4">
     <div id="sidebarContent" class="h-100 w-100 sidebar">
-        <div class="logo-details">
-            <img src="<?= URL_IMG ?>logo.svg" style="max-width:100%; max-height:100%;" />
-        </div>
         <ul class="nav-list">
             <li>
                 <a href="<?= BASE_URL . '/' ?>">
@@ -11,13 +8,13 @@
                 <span class="tooltip">Dashboard</span>
             </li>
             <li>
-                <a href="<?= BASE_URL . '/sales' ?>">
+                <a href="<?= BASE_URL . '/' ?>">
                     <img src="<?= URL_IMG ?>sales.svg" style="max-width:100%; max-height:100%;" />
                 </a>
                 <span class="tooltip">Vendas</span>
             </li>
             <li>
-                <a href="<?= BASE_URL . '/customers' ?>">
+                <a href="<?= BASE_URL . '/' ?>">
                     <img src="<?= URL_IMG ?>user.svg" style="max-width:100%; max-height:100%;" />
                 </a>
                 <span class="tooltip">Clientes</span>

@@ -3,7 +3,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
-    <div>
+    <div class="vh-100 p-4 d-flex flex-column">
         <?php
             if ($_SESSION['papelUsuario'] == "Comprador") {
             ?>
@@ -13,39 +13,41 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         <?php
             }
             ?>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Nome</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                    if (isset($data['categories'])) {
-                        foreach ($data['categories'] as $category) {
-                    ?>
-                <tr>
-                    <td><?= $category['nome_categoria'] ?></td>
-                    <td>
-                        <?php
-                                    if ($_SESSION['papelUsuario'] == "Comprador") {
-                                    ?>
-                        <button type="button" id="btnEdit" data-id="<?= $category['id'] ?>"
-                            class="btn btn-outline-primary">Editar</button>
-                        <button type="button" id="btnDelete" data-id="<?= $category['id'] ?>"
-                            class="btn btn-outline-danger">Remover</button>
-                        <?php
-                                    }
-                                    ?>
-                    </td>
-                </tr>
-                <?php
+        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        if (isset($data['categories'])) {
+                            foreach ($data['categories'] as $category) {
+                        ?>
+                    <tr>
+                        <td><?= $category['nome_categoria'] ?></td>
+                        <td>
+                            <?php
+                                        if ($_SESSION['papelUsuario'] == "Comprador") {
+                                        ?>
+                            <button type="button" id="btnEdit" data-id="<?= $category['id'] ?>"
+                                class="btn btn-outline-primary">Editar</button>
+                            <button type="button" id="btnDelete" data-id="<?= $category['id'] ?>"
+                                class="btn btn-outline-danger">Remover</button>
+                            <?php
+                                        }
+                                        ?>
+                        </td>
+                    </tr>
+                    <?php
+                            }
                         }
-                    }
-                    ?>
-            </tbody>
-        </table>
+                        ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

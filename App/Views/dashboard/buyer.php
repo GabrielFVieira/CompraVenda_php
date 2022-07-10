@@ -32,10 +32,10 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                             </a>
                         </div>
                         <div class="col-3 py-4">
-                            <a href="<?= BASE_URL ?>/providers"
+                            <a href="<?= BASE_URL ?>/products"
                                 class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
                                 role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
-                                <p class="m-0 font-weight-bold">Fornecedores</p>
+                                <p class="m-0 font-weight-bold">Produtos</p>
                             </a>
                         </div>
                     </div>
@@ -45,8 +45,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                 </div>
             </div>
             <div class="col-5 pl-5 d-flex flex-column">
-                <div class="bg-info h-100">
-                    2
+                <div style="height: 100%; border-radius: 14px; background-color: #F5F5F7;">
                 </div>
             </div>
         </div>

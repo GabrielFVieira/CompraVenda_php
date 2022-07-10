@@ -1,30 +1,55 @@
-<h1>Dashboard</h1>
 <?php
-// listando os artigos
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
-
-<div class="row">
-    <div class="card mt-3 border-0">
-        <div class="card-body px-2">
-            <i class="fas fa-user"></i> <strong>Nome</strong>
-            <p class="text-muted"><?= htmlentities(utf8_encode($_SESSION['nomeUsuario'])) ?></p>
-            <i class="fas fa-at"></i><strong> Email</strong>
-            <p class="text-muted"><?= htmlentities(utf8_encode($_SESSION['papelUsuario'])) ?></p>
-
+<div class="d-flex">
+    <?php require_once 'App/Views/sidebar/index.php' ?>
+    <div class="container-fluid p-4 mr-5">
+        <div class="row m-0 w-100 h-100 gx-5">
+            <div class="col-7 px-5 d-flex flex-column">
+                <div class="w-100 d-flex px-5"
+                    style="height: 25%; min-height:200px; border-radius: 14px; background-color: #F5F5F7;">
+                    <div class="h-100 py-5 d-flex flex-column justify-content-center text-left">
+                        <h1 class="font-weight-bold">Olá <?= $_SESSION['nomeUsuario'] ?>!</h1>
+                        <h4>Tenha um bom dia de trabalho!</h4>
+                    </div>
+                    <div class="h-100 mx-auto pl-1 d-flex align-items-end">
+                        <img src="<?= URL_IMG ?>char.svg" style="max-width:100%; max-height:100%;" />
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row" style="height:150px;">
+                        <div class="col-6 py-4">
+                            <button id="btnNewSale" class="btn btn-block text-white h-100"
+                                style="border-radius: 14px; background-color: #000;">
+                                <h2 class="font-weight-bold">Nova Venda</h2>
+                                </abutton>
+                        </div>
+                        <div class="col-3 py-4">
+                            <a href="<?= BASE_URL ?>/"
+                                class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
+                                role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
+                                <p class="m-0 font-weight-bold">Clientes</p>
+                            </a>
+                        </div>
+                        <div class="col-3 py-4">
+                            <a href="<?= BASE_URL ?>/products"
+                                class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
+                                role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
+                                <p class="m-0 font-weight-bold">Produtos</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-100 text-left flex-grow-1"
+                    style="height: 190px; border-radius: 14px; background-color: #F5F5F7;">
+                </div>
+            </div>
+            <div class="col-5 pl-5 d-flex flex-column">
+                <div style="height: 100%; border-radius: 14px; background-color: #F5F5F7;">
+                </div>
+            </div>
         </div>
     </div>
-    <div class="card mt-3 border-0">
-        <div class="card-body px-2">
-            <a href="#" class="btn btn-outline-success">Vendedor</a>
-        </div>
-    </div>
-    <div class="card mt-3 border-0">
-        <div class="card-body px-2">
-            <a href="<?= url('painelusuario') ?>" class="btn btn-outline-primary">Usuarios</a>
-        </div>
-    </div>
-
 </div>
 
 <?php endif; ?>
