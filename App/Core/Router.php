@@ -30,9 +30,10 @@ $route->get("/logout", "AccessController:logout"); // Logout endpoint
 // $route->put("/sales/{id}", "Sales:update");
 
 $route->get("/purchases", "PurchaseController:index");
-$route->get("/purchases/new", "PurchaseController:new");
 $route->post("/purchases", "PurchaseController:create");
-$route->put("/purchases/{id}", "PurchaseController:update");
+$route->get("/purchases/{id}", "PurchaseController:find");
+$route->post("/purchases/{id}", "PurchaseController:update");
+$route->delete("/purchases/{id}", "PurchaseController:remove");
 $route->post("/purchases/{id}/enable/{status}", "PurchaseController:updateStatus");
 
 $route->get("/categories", "CategoryController:index");

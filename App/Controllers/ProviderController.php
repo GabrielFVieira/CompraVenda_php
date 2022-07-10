@@ -6,7 +6,7 @@ use App\Core\BaseController;
 use App\Models\Role;
 use App\Utils\Utils;
 
-class DashboardController extends BaseController
+class ProviderController extends BaseController
 {
     function __construct()
     {
@@ -25,22 +25,26 @@ class DashboardController extends BaseController
                 $this->view('dashboard/seller');
                 break;
             case Role::Comprador:
-                $providerModel = $this->model('ProviderModel');
-                $providers = $providerModel->list();
-
-                $productModel = $this->model('ProductModel');
-                $products = $productModel->list();
-
-                $data = [
-                    'providers' => $providers,
-                    'products' => $products
-                ];
-
-                $this->view('dashboard/buyer', $data);
+                $this->view('dashboard/buyer');
                 break;
             default:
                 Utils::redirect("logout");
                 break;
         }
+    }
+
+    public function list()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') :
+
+            $model = $this->model('ProviderModel');
+
+            $providers = $model->getProviders();
+
+            echo json_encode($providers);
+            exit();
+        else :
+            Utils::redirect();
+        endif;
     }
 }

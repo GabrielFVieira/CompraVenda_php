@@ -7,7 +7,11 @@ use \PDOException;
 
 class BaseModel
 {
-    private const options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+    private const options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+        PDO::MYSQL_ATTR_INIT_COMMAND => "SET CHARACTER SET utf8"
+    ];
 
     public static function getConexao()
     {

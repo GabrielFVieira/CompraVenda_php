@@ -6,6 +6,7 @@
     <meta name="viewport">
     <link rel="shortcut icon" href="#">
     <link href="<?= URL_CSS ?>bootstrap.min.css" rel="stylesheet">
+    <link href="<?= URL_CSS ?>sidebar.css" rel="stylesheet">
     <link href="<?= URL_CSS ?>styles.css" rel="stylesheet">
     <link href="<?= URL_JS ?>sweetalert2/sweetalert2.css" rel="stylesheet">
     <link href="<?= FONTAWESOME ?>" rel="stylesheet">

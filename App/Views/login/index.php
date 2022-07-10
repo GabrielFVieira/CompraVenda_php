@@ -26,7 +26,7 @@ if (isset($data['mensagens'])) { ?>
                     <input type="hidden" name="token" value="<?= $_SESSION['token'] ?>" />
                     <div class="card-body p-5">
                         <div class="mb-1 d-flex justify-content-center" style="width: 100%; height: 5rem;">
-                            <img src="<?= URL_IMG ?>shop.svg" />
+                            <img src="<?= URL_IMG ?>logo.svg" />
                         </div>
 
                         <h5 class="mb-2 text-center">CompraVenda</h5>
