@@ -29,16 +29,23 @@ $route->get("/logout", "AccessController:logout"); // Logout endpoint
 // $route->post("/sales", "Sales:create");
 // $route->put("/sales/{id}", "Sales:update");
 
+$route->get("/products", "ProductController:index");
+$route->post("/products", "ProductController:create");
+$route->get("/products/{id}", "ProductController:find");
+$route->post("/products/{id}", "ProductController:update");
+$route->delete("/products/{id}", "ProductController:remove");
+
 $route->get("/purchases", "PurchaseController:index");
 $route->post("/purchases", "PurchaseController:create");
 $route->get("/purchases/{id}", "PurchaseController:find");
 $route->post("/purchases/{id}", "PurchaseController:update");
 $route->delete("/purchases/{id}", "PurchaseController:remove");
-$route->post("/purchases/{id}/enable/{status}", "PurchaseController:updateStatus");
 
 $route->get("/categories", "CategoryController:index");
 $route->post("/categories", "CategoryController:create");
-$route->put("/categories/{id}", "CategoryController:update");
+$route->get("/categories/{id}", "CategoryController:find");
+$route->post("/categories/{id}", "CategoryController:update");
+$route->delete("/categories/{id}", "CategoryController:remove");
 
 $route->get("/providers", "ProviderController:index");
 $route->post("/providers", "ProviderController:create");

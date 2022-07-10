@@ -1,24 +1,32 @@
-<div class="modal fade" id="modalNewPurchase" tabindex="-1" role="dialog" aria-labelledby="newPurchaseModalLabel"
+<div class="modal fade" id="modalNewProduct" tabindex="-1" role="dialog" aria-labelledby="newProductModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="newPurchaseModalLabel">Compra</h5>
+                <h5 class="modal-title" id="newProductModalLabel">Produto</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= BASE_URL . '/purchases' ?>" id="purchaseForm" method="POST">
+                <form action="<?= BASE_URL . '/products' ?>" id="productForm" method="POST">
                     <div class="form-group">
-                        <label for="product">Produto:</label>
-                        <select class="form-control" name="product" id="product">
+                        <label for="name">Nome:</label>
+                        <input type="text" class="form-control" id="name" name="name" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Descrição:</label>
+                        <input type="textArea" class="form-control" id="description" name="description" maxlength="255">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Categoria:</label>
+                        <select class="form-control" name="category" id="category">
                             <option disabled selected value>- Selecione uma opção -</option>
                             <?php
-                            if (isset($data['products'])) {
-                                foreach ($data['products'] as $product) {
+                            if (isset($data['categories'])) {
+                                foreach ($data['categories'] as $category) {
                             ?>
-                            <option value="<?= $product['id'] ?>"><?= $product['nome_produto'] ?></option>
+                            <option value="<?= $category['id'] ?>"><?= $category['nome_categoria'] ?></option>
                             <?php
                                 }
                             }
@@ -26,32 +34,20 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="provider">Fornecedor:</label>
-                        <select class="form-control" name="provider" id="provider">
-                            <option disabled selected value>- Selecione uma opção -</option>
-                            <?php
-                            if (isset($data['providers'])) {
-                                foreach ($data['providers'] as $provider) {
-                            ?>
-                            <option value="<?= $provider['id'] ?>"><?= $provider['razao_social'] ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="amount">Quantidade:</label>
-                        <input type="number" class="form-control" id="amount" name="amount" min="1">
-                    </div>
-                    <div class="form-group">
-                        <label for="value">Valor:</label>
+                        <label for="sellValue">Preço Venda:</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">R$</div>
                             </div>
-                            <input type="number" class="form-control" name="value" id="value" min="0" />
+                            <input type="text" class="form-control" name="sellValue" id="sellValue"
+                                placeholder="000,00" />
                         </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="active" id="active" value="true">
+                        <label class="form-check-label" for="active">
+                            Liberar para venda
+                        </label>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -71,11 +67,11 @@
 
 <script>
 $(document).ready(function() {
-    const validator = $('#purchaseForm').validate({
+    const validator = $('#productForm').validate({
         errorPlacement: function(label, element) {
             label.addClass('error-msg text-danger');
 
-            if (element[0].id === 'value') {
+            if (element[0].id === 'sellValue') {
                 label.insertAfter(element[0].parentElement);
             } else {
                 label.insertAfter(element);
@@ -83,20 +79,28 @@ $(document).ready(function() {
         },
         wrapper: 'span',
         rules: {
-            product: {
+            name: {
+                required: true,
+                maxlength: 100,
+            },
+            description: {
+                required: true,
+                maxlength: 255,
+            },
+            category: {
                 required: true,
             },
-            provider: {
+            active: {
                 required: true,
             },
-            amount: {
-                required: true,
-                min: 1
-            },
-            value: {
+            sellValue: {
                 required: true,
             },
         }
+    });
+
+    $('#sellValue').mask('0.000.000.000,00', {
+        reverse: true
     });
 });
 </script>

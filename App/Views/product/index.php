@@ -1,6 +1,27 @@
 <?php
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
+<?php
+    if (isset($data['errors'])) { ?>
+<div class="w-100">
+    <div class="mt-5 alert alert-danger alert-dismissible fade show text-center" role="alert"
+        style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
+        <?php
+
+                foreach ($data['errors'] as $error) {
+                    echo $error . "<br>";
+                }
+
+                ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
+<?php
+    }
+    ?>
+
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div>
@@ -8,7 +29,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
             if ($_SESSION['papelUsuario'] == "Comprador") {
             ?>
         <button id="btnNew" class="btn text-white" style="border-radius: 14px; background-color: #000;">
-            Nova Compra
+            Novo produto
         </button>
         <?php
             }
@@ -16,39 +37,34 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Produto</th>
-                    <th scope="col">Fornecedor</th>
-                    <th scope="col">Vendedor</th>
-                    <th scope="col">Data Compra</th>
-                    <th scope="col">Quantidade</th>
-                    <th scope="col">Valor Un.</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Preço Compra</th>
+                    <th scope="col">Preço Venda</th>
+                    <th scope="col">Quantidade Disponível</th>
+                    <th scope="col">Categoria</th>
+                    <th scope="col">Liberado</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                    if (isset($data['purchases'])) {
-                        foreach ($data['purchases'] as $purchase) {
-                            $date = date_create($purchase['data_compra']);
+                    if (isset($data['products'])) {
+                        foreach ($data['products'] as $product) {
                     ?>
                 <tr>
-                    <td><?= $purchase['nome_produto'] ?></td>
-                    <td><?= $purchase['fornecedor'] ?></td>
-                    <td><?= $purchase['nome_funcionario'] ?></td>
-                    <td><?= date_format($date, 'd/m/Y') ?></td>
-                    <td><?= $purchase['quantidade_compra'] ?></td>
-                    <td>R$<?= $purchase['valor_compra'] ?></td>
+                    <td><?= $product['nome_produto'] ?></td>
+                    <td><?= $product['descricao'] ?></td>
+                    <td>R$<?= $product['preco_compra'] ?></td>
+                    <td>R$<?= $product['preco_venda'] ?></td>
+                    <td><?= $product['quantidade_disponível'] ?></td>
+                    <td><?= $product['nome_categoria'] ?></td>
+                    <td><?= $product['liberado_venda'] ?></td>
                     <td>
-                        <?php
-                                    if ($purchase['id_funcionario'] == $_SESSION['id']) {
-                                    ?>
-                        <button type="button" id="btnEdit" data-id="<?= $purchase['id'] ?>"
+                        <button type="button" id="btnEdit" data-id="<?= $product['id'] ?>"
                             class="btn btn-outline-primary">Editar</button>
-                        <button type="button" id="btnDelete" data-id="<?= $purchase['id'] ?>"
+                        <button type="button" id="btnDelete" data-id="<?= $product['id'] ?>"
                             class="btn btn-outline-danger">Remover</button>
-                        <?php
-                                    }
-                                    ?>
                     </td>
                 </tr>
                 <?php
@@ -62,35 +78,43 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
 
-<?php require_once 'App/Views/purchase/new.php' ?>
+<?php require_once 'App/Views/product/new.php' ?>
 
 <script>
 $(document).ready(function() {
     $('#btnNew').on('click', function() {
-        $("#product").val("");
-        $("#provider").val("");
-        $("#amount").val("");
-        $("#value").val("");
+        $("#name").val("");
+        $("#description").val("");
+        $("#active").prop("checked", false);
+        $("#category").val("");
 
-        $('#purchaseForm').attr('action', '<?= BASE_URL . '/purchases' ?>')
-        $("#modalNewPurchase").modal('show');
+        $('#productForm').attr('action', '<?= BASE_URL . '/products' ?>')
+        $("#modalNewProduct").modal('show');
     })
 
     $(document).on("click", "#btnEdit", function() {
         var id = $(this).attr("data-id");
 
         $.ajax({
-            url: "<?= BASE_URL . '/purchases/' ?>" + id,
+            url: "<?= BASE_URL . '/products/' ?>" + id,
             type: "GET",
             dataType: "JSON",
             success: function(data) {
-                $("#product").val(data.id_produto);
-                $("#provider").val(data.id_fornecedor);
-                $("#amount").val(data.quantidade_compra);
-                $("#value").val(data.valor_compra);
 
-                $('#purchaseForm').attr('action', '<?= BASE_URL . '/purchases' ?>/' + id)
-                $("#modalNewPurchase").modal('show');
+                console.log(data)
+
+                $("#name").val(data.nome_produto);
+                $("#description").val(data.descricao);
+                $("#category").val(data.id_categoria);
+
+                const active = data.liberado_venda == "S" ? true : false
+                $("#active").prop("checked", active);
+
+                $("#description").val(data.descricao);
+                $("#sellValue").val(data.preco_venda);
+
+                $('#productForm').attr('action', '<?= BASE_URL . '/products' ?>/' + id)
+                $("#modalNewProduct").modal('show');
             },
             error: function(data) {
                 response = data.responseJSON;
@@ -115,7 +139,7 @@ $(document).ready(function() {
         var id = $(this).attr("data-id");
 
         Swal.fire({
-            title: 'Confirma a exclusão da compra?',
+            title: 'Confirma a exclusão do produto?',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -124,13 +148,13 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "<?= BASE_URL . '/purchases/' ?>" + id,
+                    url: "<?= BASE_URL . '/products/' ?>" + id,
                     type: "DELETE",
                     dataType: "JSON",
                     success: function(data) {
                         Swal.fire({
                             title: "Sucesso",
-                            text: "Compra excluida com sucesso",
+                            text: "Produto excluido com sucesso",
                             icon: "success",
                         }).then(() => {
                             location.reload();

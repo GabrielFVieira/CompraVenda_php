@@ -17,7 +17,7 @@
                 <span class="tooltip">Vendas</span>
             </li>
             <li>
-                <a href="<?= BASE_URL . '/clients' ?>">
+                <a href="<?= BASE_URL . '/customers' ?>">
                     <img src="<?= URL_IMG ?>user.svg" style="max-width:100%; max-height:100%;" />
                 </a>
                 <span class="tooltip">Clientes</span>

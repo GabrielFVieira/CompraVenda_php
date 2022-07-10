@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Core\BaseController;
-use App\Models\Role;
 use App\Utils\Utils;
 use GUMP as Validador;
 
@@ -84,9 +83,9 @@ class PurchaseController extends BaseController
 
                     $productModel->update($product);
 
-                    $messages = ['Compra cadastrada com sucesso'];
-                    $data = ['messages' => $messages];
-                    Utils::redirect('purchases', $data);
+                    // $messages = ['Compra cadastrada com sucesso'];
+                    // $data = ['messages' => $messages];
+                    Utils::redirect('purchases');
                 endif;
 
             else :
@@ -111,9 +110,9 @@ class PurchaseController extends BaseController
                 $oldPurchase = $purchaseModel->get($path['id']);
 
                 if (is_null($oldPurchase)) :
-                    $erros = ['Compra não encontrado'];
-                    $data = ['erros' => $erros];
-                    Utils::redirect('purchases', $data);
+                    // $erros = ['Compra não encontrado'];
+                    // $data = ['erros' => $erros];
+                    Utils::redirect('purchases');
                     exit();
                 endif;
 
@@ -145,15 +144,15 @@ class PurchaseController extends BaseController
 
                     $productModel->update($product);
 
-                    $messages = ['Compra atualizada com sucesso'];
-                    $data = ['messages' => $messages];
-                    Utils::redirect('purchases', $data);
+                    // $messages = ['Compra atualizada com sucesso'];
+                    // $data = ['messages' => $messages];
+                    Utils::redirect('purchases');
                 endif;
 
             else :
                 $erros = $validacao->get_errors_array();
                 $data = ['erros' => $erros];
-                Utils::redirect('purchases', $data);
+                $this->view('purchases', $data);
             endif;
         else :
             Utils::redirect();
