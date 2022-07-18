@@ -26,7 +26,17 @@ class CategoryController extends BaseController
         endif;
     }
 
-    private function loadCategoryView($errors = null, $messages = null)
+    private function jsonResponse($status = 200, $json = null)
+    {
+        http_response_code($status);
+        if (!is_null($json)) :
+            echo json_encode($json);
+        else :
+            echo json_encode(array());
+        endif;
+    }
+
+    public function index()
     {
         $categoryModel = $this->model('CategoryModel');
         $categories = $categoryModel->list();
@@ -35,43 +45,35 @@ class CategoryController extends BaseController
             'categories' => $categories
         ];
 
-        if (isset($messages)) :
-            $data['messages'] = $messages;
-        endif;
-
-        if (isset($errors)) :
-            $data["errors"] = $errors;
-        endif;
-
         $this->view('category/index', $data);
     }
 
-    private function jsonResponse($status = 200, $json = null)
+    private function validateInput($data)
     {
-        http_response_code($status);
-        if (!is_null($json)) :
-            echo json_encode($json);
-        endif;
-    }
+        $validacao = new Validador("pt-br");
+        $post_filtrado = $validacao->filter($data, $this->filters);
+        $post_validado = $validacao->validate($post_filtrado, $this->rules);
 
-    public function index()
-    {
-        $this->loadCategoryView();
+        if ($post_validado === true) :
+            return true;
+        else :
+            $errors = $validacao->get_errors_array();
+
+            $formattedErrors = [];
+            foreach ($errors as $value) {
+                array_push($formattedErrors, $value);
+            }
+
+            $data = ['errors' => $formattedErrors];
+            $this->jsonResponse(400, $data);
+            return false;
+        endif;
     }
 
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
-
-            if (!$post_validado) {
-                $errors = $validacao->get_errors_array();
-                $data = ['errors' => $errors];
-
-                // Validation Error
-                $this->jsonResponse(400, $data);
+            if ($this->validateInput($_POST) == false) {
                 exit();
             }
 
@@ -96,35 +98,30 @@ class CategoryController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
             parse_str(file_get_contents('php://input'), $_PUT);
+            if ($this->validateInput($_PUT) == false) {
+                exit();
+            }
 
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_PUT, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+            $categoryModel = $this->model('CategoryModel');
+            $oldCategory = $categoryModel->get($path['id']);
 
-            if ($post_validado === true) :
-                $categoryModel = $this->model('CategoryModel');
-                $oldCategory = $categoryModel->get($path['id']);
-
-                if (is_null($oldCategory)) :
-                    $errors = ['Categoria não encontrada'];
-                    $this->loadCategoryView($errors);
-                    exit();
-                endif;
-
-                $oldCategory->setNome($_PUT['name']);
-
-                try {
-                    $categoryModel->update($oldCategory);
-                    $this->jsonResponse();
-                } catch (Exception $e) {
-                    $errors = [$e->getMessage()];
-                    $data = ['errors' => $errors];
-                    $this->jsonResponse(500, $data);
-                }
-            else :
-                $errors = $validacao->get_errors_array();
-                $this->loadCategoryView($errors);
+            if (is_null($oldCategory)) :
+                $errors = ['Categoria não encontrada'];
+                $data = ['errors' => $errors];
+                $this->jsonResponse(404, $data);
+                exit();
             endif;
+
+            $oldCategory->setNome($_PUT['name']);
+
+            try {
+                $categoryModel->update($oldCategory);
+                $this->jsonResponse();
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                $this->jsonResponse(500, $data);
+            }
         else :
             Utils::redirect();
         endif;
@@ -134,18 +131,23 @@ class CategoryController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
             $id = $path['id'];
-
             $categoryModel = $this->model('CategoryModel');
-            $category = $categoryModel->get($id);
 
-            if (!is_null($category)) :
-                echo json_encode($category);
-            else :
-                $data = array();
-                $data['error'] = 'Categoria não encontrada';
-                http_response_code(404);
-                echo json_encode($data);
-            endif;
+            try {
+                $category = $categoryModel->get($id);
+
+                if (!is_null($category)) :
+                    $this->jsonResponse(200, $category);
+                else :
+                    $errors = ['Categoria não encontrada'];
+                    $data = ['errors' => $errors];
+                    $this->jsonResponse(404, $data);
+                endif;
+            } catch (Exception $e) {
+                $errors = ['Erro ao listar categorias'];
+                $data = ['errors' => $errors];
+                $this->jsonResponse(500, $data);
+            }
 
             exit();
         else :
@@ -159,11 +161,16 @@ class CategoryController extends BaseController
             $id = $data['id'];
 
             $categoryModel = $this->model('CategoryModel');
-            $categoryModel->remove($id);
 
-            $data = array();
-            $data['status'] = true;
-            echo json_encode($data);
+            try {
+                $categoryModel->remove($id);
+                $this->jsonResponse(204);
+            } catch (Exception $e) {
+                $errors = ['Erro ao remover categoria'];
+                $data = ['errors' => $errors];
+                $this->jsonResponse(500, $data);
+            }
+
             exit();
         else :
             Utils::redirect();

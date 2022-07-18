@@ -34,7 +34,6 @@ class AccessController extends BaseController
 
     public function login()
     {
-
         if ($_SERVER['REQUEST_METHOD'] == "POST") :
             $validacao = new Validador("pt-br");
 

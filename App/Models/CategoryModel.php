@@ -24,7 +24,7 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            echo 'Erro ao cadastrar categoria: ' . $e->getMessage();
+            error_log('Erro ao cadastrar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -41,7 +41,7 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            echo 'Erro ao atualizar categoria: ' . $e->getMessage();
+            error_log('Erro ao atualizar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -65,7 +65,7 @@ class CategoryModel extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            echo 'Erro ao buscar categoria: ' . $e->getMessage();
+            error_log('Erro ao buscar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -92,7 +92,7 @@ class CategoryModel extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            echo 'Erro ao listar categorias: ' . $e->getMessage();
+            error_log('Erro ao listar categorias: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -108,7 +108,7 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            echo 'Erro ao remover categoria: ' . $e->getMessage();
+            error_log('Erro ao remover categoria: ' . $e->getMessage());
             throw $e;
         }
     }
