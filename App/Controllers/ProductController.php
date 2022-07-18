@@ -28,6 +28,7 @@ class ProductController extends BaseController
         session_start();
         if (!Utils::usuarioLogado()) :
             Utils::redirect("login");
+            exit();
         endif;
     }
 

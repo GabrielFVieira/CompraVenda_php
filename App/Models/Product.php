@@ -2,7 +2,7 @@
 
 namespace App\models;
 
-class Product
+class Product implements \JsonSerializable
 {
     private $id, $nome, $descricao, $precoCompra, $precoVenda,
         $quantidadeDisponivel, $liberadoVenda, $idCategoria, $nomeCategoria;
@@ -121,5 +121,10 @@ class Product
     public function setNomeCategoria(string $nomeCategoria)
     {
         $this->nomeCategoria = $nomeCategoria;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

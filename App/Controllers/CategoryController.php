@@ -23,16 +23,7 @@ class CategoryController extends BaseController
         session_start();
         if (!Utils::usuarioLogado()) :
             Utils::redirect("login");
-        endif;
-    }
-
-    private function jsonResponse($status = 200, $json = null)
-    {
-        http_response_code($status);
-        if (!is_null($json)) :
-            echo json_encode($json);
-        else :
-            echo json_encode(array());
+            exit();
         endif;
     }
 
@@ -65,7 +56,7 @@ class CategoryController extends BaseController
             }
 
             $data = ['errors' => $formattedErrors];
-            $this->jsonResponse(400, $data);
+            Utils::jsonResponse(400, $data);
             return false;
         endif;
     }
@@ -83,11 +74,11 @@ class CategoryController extends BaseController
 
             try {
                 $categoryModel->create($category);
-                $this->jsonResponse(201);
+                Utils::jsonResponse(201);
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
                 $data = ['errors' => $errors];
-                $this->jsonResponse(500, $data);
+                Utils::jsonResponse(500, $data);
             }
         else :
             Utils::redirect();
@@ -97,7 +88,7 @@ class CategoryController extends BaseController
     public function update($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
-            parse_str(file_get_contents('php://input'), $_PUT);
+            Utils::loadPutValues($_PUT);
             if ($this->validateInput($_PUT) == false) {
                 exit();
             }
@@ -108,7 +99,7 @@ class CategoryController extends BaseController
             if (is_null($oldCategory)) :
                 $errors = ['Categoria não encontrada'];
                 $data = ['errors' => $errors];
-                $this->jsonResponse(404, $data);
+                Utils::jsonResponse(404, $data);
                 exit();
             endif;
 
@@ -116,11 +107,11 @@ class CategoryController extends BaseController
 
             try {
                 $categoryModel->update($oldCategory);
-                $this->jsonResponse();
+                Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
                 $data = ['errors' => $errors];
-                $this->jsonResponse(500, $data);
+                Utils::jsonResponse(500, $data);
             }
         else :
             Utils::redirect();
@@ -137,16 +128,16 @@ class CategoryController extends BaseController
                 $category = $categoryModel->get($id);
 
                 if (!is_null($category)) :
-                    $this->jsonResponse(200, $category);
+                    Utils::jsonResponse(200, $category);
                 else :
                     $errors = ['Categoria não encontrada'];
                     $data = ['errors' => $errors];
-                    $this->jsonResponse(404, $data);
+                    Utils::jsonResponse(404, $data);
                 endif;
             } catch (Exception $e) {
                 $errors = ['Erro ao listar categorias'];
                 $data = ['errors' => $errors];
-                $this->jsonResponse(500, $data);
+                Utils::jsonResponse(500, $data);
             }
 
             exit();
@@ -164,11 +155,11 @@ class CategoryController extends BaseController
 
             try {
                 $categoryModel->remove($id);
-                $this->jsonResponse(204);
+                Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover categoria'];
                 $data = ['errors' => $errors];
-                $this->jsonResponse(500, $data);
+                Utils::jsonResponse(500, $data);
             }
 
             exit();

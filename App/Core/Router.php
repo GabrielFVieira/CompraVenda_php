@@ -32,7 +32,7 @@ $route->get("/logout", "AccessController:logout"); // Logout endpoint
 $route->get("/products", "ProductController:index");
 $route->post("/products", "ProductController:create");
 $route->get("/products/{id}", "ProductController:find");
-$route->post("/products/{id}", "ProductController:update");
+$route->put("/products/{id}", "ProductController:update");
 $route->delete("/products/{id}", "ProductController:remove");
 
 $route->get("/purchases", "PurchaseController:index");

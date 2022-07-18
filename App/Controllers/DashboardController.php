@@ -13,6 +13,7 @@ class DashboardController extends BaseController
         session_start();
         if (!Utils::usuarioLogado()) :
             Utils::redirect("login");
+            exit();
         endif;
     }
 
@@ -25,22 +26,28 @@ class DashboardController extends BaseController
                 $this->view('dashboard/seller');
                 break;
             case Role::Comprador:
-                $providerModel = $this->model('ProviderModel');
-                $providers = $providerModel->list();
-
-                $productModel = $this->model('ProductModel');
-                $products = $productModel->list();
-
-                $data = [
-                    'providers' => $providers,
-                    'products' => $products
-                ];
-
+                $data = $this->getBuyerData();
                 $this->view('dashboard/buyer', $data);
                 break;
             default:
                 Utils::redirect("logout");
                 break;
         }
+    }
+
+    private function getBuyerData()
+    {
+        $providerModel = $this->model('ProviderModel');
+        $providers = $providerModel->list();
+
+        $productModel = $this->model('ProductModel');
+        $products = $productModel->list();
+
+        $data = [
+            'providers' => $providers,
+            'products' => $products
+        ];
+
+        return $data;
     }
 }

@@ -1,38 +1,3 @@
-<div class="w-100">
-    <div class="mt-5 alert alert-info alert-dismissible fade show text-center" role="alert"
-        style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
-        Usuários disponíveis:<br>
-        Comprador: 167.740.300-41<br>
-        Vendedor: 081.599.500-80<br>
-        <br>
-        Login do administrador não possui dashboard no momento
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-</div>
-
-<?php
-if (isset($data['mensagens'])) { ?>
-<div class="w-100">
-    <div class="mt-5 alert alert-danger alert-dismissible fade show text-center" role="alert"
-        style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
-        <?php
-
-            foreach ($data['mensagens'] as $mensagem) {
-                echo $mensagem . "<br>";
-            }
-
-            ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-</div>
-<?php
-}
-?>
-
 <section class="vh-100" style="background-color: #000;">
     <div class="container d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -70,6 +35,20 @@ if (isset($data['mensagens'])) { ?>
         </div>
     </div>
 </section>
+
+<div class="w-100">
+    <div class="mt-5 alert alert-info alert-dismissible fade show text-center" role="alert"
+        style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
+        Usuários disponíveis:<br>
+        Comprador: 167.740.300-41<br>
+        Vendedor: 081.599.500-80<br>
+        <br>
+        Login do administrador não possui dashboard no momento
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
 <script src="<?= URL_JS ?>popper.min.js"></script>
