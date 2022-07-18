@@ -84,129 +84,32 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 <script src="<?= URL_JS ?>jquery.validate.min.js"></script>
 <script src="<?= URL_JS ?>additional-methods.min.js"></script>
 <script src="<?= URL_JS ?>localization/messages_pt_BR.js"></script>
+<script src="<?= URL_JS ?>defaultScripts.js"></script>
 <script>
-const handleError = (data) => {
-    response = data.responseJSON;
-
-    message = "";
-    if (response && response.errors) {
-        response.errors.forEach(err => {
-            message += err + "<br>";
-        });
-    } else {
-        message = "Erro Inesperado";
+$(document).ready(function() {
+    const setupFieldValues = (data) => {
+        $("#id").val(data.id);
+        $("#name").val(data.nome);
     }
 
-    Swal.fire({
-        title: "Erro",
-        html: message,
-        icon: "error",
-    });
-
-    $("#id").val("");
-    $("#name").val("");
-    $("#modalNewCategory").modal('hide');
-}
-
-$(document).ready(function() {
-    const validator = $('#categoryForm').validate({
-        errorPlacement: function(label, element) {
-            label.addClass('error-msg text-danger');
-            label.insertAfter(element);
-        },
-        wrapper: 'span',
-        rules: {
-            name: {
-                required: true,
-                maxlength: 50
-            },
-        }
-    });
-
-    $("#categoryForm").submit(function(e) {
-        e.preventDefault();
-
-        var form = $(this);
-        var actionUrl = form.attr('action');
-        var id = $("#id").val();
-
-        $.ajax({
-            type: id ? "PUT" : "POST",
-            url: id ? (actionUrl + "/" + id) : actionUrl,
-            data: form.serialize(),
-            dataType: "JSON",
-            success: function(data) {
-                Swal.fire({
-                    title: "Sucesso",
-                    text: "Categoria " + (id ? "atualizada" : "cadastrada") +
-                        " com sucesso",
-                    icon: "success",
-                }).then(() => {
-                    location.reload();
-                });
-            },
-            error: function(data) {
-                handleError(data)
-            }
-        });
-    });
-
-    $('#btnNew').on('click', function() {
+    const emptyFields = () => {
         $("#id").val("");
         $("#name").val("");
-        $("#modalNewCategory").modal('show');
-    })
+    }
 
-    $(document).on("click", "#btnEdit", function() {
-        var id = $(this).attr("data-id");
+    options = {
+        resource: "Categoria",
+        path: "<?= BASE_URL . '/categories' ?>",
+        formId: "#categoryForm",
+        btnNewId: "#btnNew",
+        btnEditId: "#btnEdit",
+        btnDeleteId: "#btnDelete",
+        modelId: "#modalNewCategory",
+        setupFieldValues: setupFieldValues,
+        emptyFields: emptyFields
+    }
 
-        $.ajax({
-            url: "<?= BASE_URL . '/categories' ?>/" + id,
-            type: "GET",
-            dataType: "JSON",
-            success: function(data) {
-                $("#id").val(id);
-                $("#name").val(data.nome)
-                $("#modalNewCategory").modal('show');
-            },
-            error: function(data) {
-                handleError(data)
-            }
-        });
-    })
-
-    $(document).on("click", "#btnDelete", function() {
-        var id = $(this).attr("data-id");
-
-        Swal.fire({
-            title: 'Confirma a exclusão da categoria?',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            cancelButtonText: 'Cancelar',
-            confirmButtonText: 'Confirma Exclusão'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?= BASE_URL . '/categories/' ?>" + id,
-                    type: "DELETE",
-                    dataType: "JSON",
-                    success: function(data) {
-                        Swal.fire({
-                            title: "Sucesso",
-                            text: "Categoria excluida com sucesso",
-                            icon: "success",
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function(data) {
-                        handleError(data)
-                    }
-                });
-            }
-        })
-    })
+    setupDocument(options);
 });
 </script>
 <?php endif; ?>
