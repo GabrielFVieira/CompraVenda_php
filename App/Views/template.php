@@ -14,6 +14,8 @@
 </head>
 
 <body>
+    <?php require_once 'App/Views/errors.php' ?>
+    <?php require_once 'App/Views/messages.php' ?>
     <?php require_once 'App/Views/' . $view . '.php' ?>
 
     <script src="<?= URL_JS ?>bootstrap.min.js"></script>

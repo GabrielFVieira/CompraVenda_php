@@ -44,7 +44,7 @@ $route->delete("/purchases/{id}", "PurchaseController:remove");
 $route->get("/categories", "CategoryController:index");
 $route->post("/categories", "CategoryController:create");
 $route->get("/categories/{id}", "CategoryController:find");
-$route->post("/categories/{id}", "CategoryController:update");
+$route->put("/categories/{id}", "CategoryController:update");
 $route->delete("/categories/{id}", "CategoryController:remove");
 
 $route->get("/providers", "ProviderController:index");

@@ -2,7 +2,7 @@
 
 namespace App\models;
 
-class Category
+class Category implements \JsonSerializable
 {
     private $id, $nome;
 
@@ -30,5 +30,10 @@ class Category
     public function setNome($nome)
     {
         $this->nome = $nome;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

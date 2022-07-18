@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use \Exception;
 use App\Core\BaseController;
 use App\Utils\Utils;
+use App\models\Category;
 use GUMP as Validador;
 
 class CategoryController extends BaseController
@@ -24,7 +26,7 @@ class CategoryController extends BaseController
         endif;
     }
 
-    public function index()
+    private function loadCategoryView($errors = null, $messages = null)
     {
         $categoryModel = $this->model('CategoryModel');
         $categories = $categoryModel->list();
@@ -33,7 +35,28 @@ class CategoryController extends BaseController
             'categories' => $categories
         ];
 
+        if (isset($messages)) :
+            $data['messages'] = $messages;
+        endif;
+
+        if (isset($errors)) :
+            $data["errors"] = $errors;
+        endif;
+
         $this->view('category/index', $data);
+    }
+
+    private function jsonResponse($status = 200, $json = null)
+    {
+        http_response_code($status);
+        if (!is_null($json)) :
+            echo json_encode($json);
+        endif;
+    }
+
+    public function index()
+    {
+        $this->loadCategoryView();
     }
 
     public function create()
@@ -43,21 +66,27 @@ class CategoryController extends BaseController
             $post_filtrado = $validacao->filter($_POST, $this->filters);
             $post_validado = $validacao->validate($post_filtrado, $this->rules);
 
-            if ($post_validado === true) :
-                $category = new \App\models\Category();
-                $category->setNome($_POST['name']);
+            if (!$post_validado) {
+                $errors = $validacao->get_errors_array();
+                $data = ['errors' => $errors];
 
-                $categoryModel = $this->model('CategoryModel');
+                // Validation Error
+                $this->jsonResponse(400, $data);
+                exit();
+            }
+
+            $category = new Category();
+            $category->setNome($_POST['name']);
+            $categoryModel = $this->model('CategoryModel');
+
+            try {
                 $categoryModel->create($category);
-
-                $messages = ['Categoria cadastrada com sucesso'];
-                $data = ['messages' => $messages];
-                Utils::redirect('categories', $data);
-            else :
-                $erros = $validacao->get_errors_array();
-                $data = ['erros' => $erros];
-                $this->view('categories', $data);
-            endif;
+                $this->jsonResponse(201);
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                $this->jsonResponse(500, $data);
+            }
         else :
             Utils::redirect();
         endif;
@@ -65,9 +94,11 @@ class CategoryController extends BaseController
 
     public function update($path)
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') :
+        if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
+            parse_str(file_get_contents('php://input'), $_PUT);
+
             $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
+            $post_filtrado = $validacao->filter($_PUT, $this->filters);
             $post_validado = $validacao->validate($post_filtrado, $this->rules);
 
             if ($post_validado === true) :
@@ -75,23 +106,24 @@ class CategoryController extends BaseController
                 $oldCategory = $categoryModel->get($path['id']);
 
                 if (is_null($oldCategory)) :
-                    // $erros = ['Categoria não encontrada'];
-                    // $data = ['erros' => $erros];
-                    Utils::redirect('categories');
+                    $errors = ['Categoria não encontrada'];
+                    $this->loadCategoryView($errors);
                     exit();
                 endif;
 
-                $oldCategory->setNome($_POST['name']);
-                $categoryModel->update($oldCategory);
+                $oldCategory->setNome($_PUT['name']);
 
-                // $messages = ['Categoria atualizada com sucesso'];
-                // $data = ['messages' => $messages];
-                Utils::redirect('categories');
-
+                try {
+                    $categoryModel->update($oldCategory);
+                    $this->jsonResponse();
+                } catch (Exception $e) {
+                    $errors = [$e->getMessage()];
+                    $data = ['errors' => $errors];
+                    $this->jsonResponse(500, $data);
+                }
             else :
-                // $erros = $validacao->get_errors_array();
-                // $data = ['erros' => $erros];
-                Utils::redirect('categories');
+                $errors = $validacao->get_errors_array();
+                $this->loadCategoryView($errors);
             endif;
         else :
             Utils::redirect();

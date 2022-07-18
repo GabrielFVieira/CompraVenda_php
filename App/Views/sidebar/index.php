@@ -3,43 +3,49 @@
         <ul class="nav-list">
             <li>
                 <a href="<?= BASE_URL . '/' ?>">
-                    <img src="<?= URL_IMG ?>home.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>home.svg" style="padding: 5px" />
                 </a>
                 <span class="tooltip">Dashboard</span>
             </li>
             <li>
                 <a href="<?= BASE_URL . '/' ?>">
-                    <img src="<?= URL_IMG ?>sales.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>sales.svg" />
                 </a>
                 <span class="tooltip">Vendas</span>
             </li>
             <li>
                 <a href="<?= BASE_URL . '/' ?>">
-                    <img src="<?= URL_IMG ?>user.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>user.svg" style="padding: 8px" />
                 </a>
                 <span class="tooltip">Clientes</span>
             </li>
             <li>
                 <a href="<?= BASE_URL . '/products' ?>">
-                    <img src="<?= URL_IMG ?>products.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>products.svg" />
                 </a>
                 <span class="tooltip">Produtos</span>
             </li>
             <li>
-                <a href="<?= BASE_URL . '/purchases' ?>">
-                    <img src="<?= URL_IMG ?>purchases.svg" style="max-width:100%; max-height:100%;" />
-                </a>
-                <span class="tooltip">Compras</span>
-            </li>
-            <li>
                 <a href="<?= BASE_URL . '/categories' ?>">
-                    <img src="<?= URL_IMG ?>categories.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>categories.svg" />
                 </a>
                 <span class="tooltip">Categorias</span>
             </li>
             <li>
+                <a href="<?= BASE_URL . '/providers' ?>">
+                    <img src="<?= URL_IMG ?>providers.svg" />
+                </a>
+                <span class="tooltip">Fornecedores</span>
+            </li>
+            <li>
+                <a href="<?= BASE_URL . '/purchases' ?>">
+                    <img src="<?= URL_IMG ?>purchases.svg" style="padding: 5px" />
+                </a>
+                <span class="tooltip">Compras</span>
+            </li>
+            <li>
                 <a href="<?= BASE_URL . '/logout' ?>">
-                    <img src="<?= URL_IMG ?>logout.svg" style="max-width:100%; max-height:100%;" />
+                    <img src="<?= URL_IMG ?>logout.svg" style="padding: 5px" />
                 </a>
                 <span class="tooltip">Sair</span>
             </li>

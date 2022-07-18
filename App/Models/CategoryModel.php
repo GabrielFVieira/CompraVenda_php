@@ -1,10 +1,19 @@
 <?php
 
 use App\Core\BaseModel;
+use App\models\Category;
 
 class CategoryModel extends BaseModel
 {
-    public function create($category)
+    private static function ModelFromDBArray($array)
+    {
+        $category = new Category();
+        $category->setId($array['id']);
+        $category->setNome($array['nome_categoria']);
+        return $category;
+    }
+
+    public function create(Category $category)
     {
         try {
             $sql = "INSERT INTO categorias(nome_categoria) VALUES (?)";
@@ -15,11 +24,12 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao cadastrar compra: ' . $e->getMessage());
+            echo 'Erro ao cadastrar categoria: ' . $e->getMessage();
+            throw $e;
         }
     }
 
-    public function update($category)
+    public function update(Category $category)
     {
         try {
             $sql = "UPDATE categorias SET nome_categoria = ? WHERE id = ?";
@@ -31,11 +41,12 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao atualizar categoria: ' . $e->getMessage());
+            echo 'Erro ao atualizar categoria: ' . $e->getMessage();
+            throw $e;
         }
     }
 
-    public function get($id)
+    public function get(int $id)
     {
         try {
             $sql = "Select * from categorias where id = ? limit 1";
@@ -49,12 +60,13 @@ class CategoryModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return $result;
+                return CategoryModel::ModelFromDBArray($result);
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            echo 'Erro ao buscar categoria: ' . $e->getMessage();
+            throw $e;
         }
     }
 
@@ -69,12 +81,19 @@ class CategoryModel extends BaseModel
 
             if ($stmt->rowCount() > 0) :
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                return $resultset;
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, CategoryModel::ModelFromDBArray($value));
+                }
+
+                return $result;
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            echo 'Erro ao listar categorias: ' . $e->getMessage();
+            throw $e;
         }
     }
 
@@ -89,7 +108,8 @@ class CategoryModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            echo 'Erro ao remover categoria: ' . $e->getMessage();
+            throw $e;
         }
     }
 }

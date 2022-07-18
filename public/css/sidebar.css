@@ -77,6 +77,10 @@
 
 .sidebar li a img {
 	margin: 0;
+	height: auto;
+	max-width: 100%;
+	max-height: 100%;
+	padding: 2px;
 }
 .sidebar li a:hover {
 	background: #fff;
