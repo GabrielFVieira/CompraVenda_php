@@ -1,9 +1,29 @@
 <?php
 
 use App\Core\BaseModel;
+use App\models\Product;
 
 class ProductModel extends BaseModel
 {
+    private static function ModelFromDBArray($array)
+    {
+        $product = new Product();
+        $product->setId($array["id"]);
+        $product->setNome($array["nome_produto"]);
+        $product->setDescricao($array["descricao"]);
+        $product->setPrecoCompra($array["preco_compra"]);
+        $product->setPrecoVenda($array["preco_venda"]);
+        $product->setQuantidadeDisponivel($array["quantidade_disponível"]);
+        $product->setLiberadoVenda($array["liberado_venda"]);
+        $product->setIdCategoria($array["id_categoria"]);
+
+        if (isset($array["nome_categoria"])) {
+            $product->setNomeCategoria($array["nome_categoria"]);
+        }
+
+        return $product;
+    }
+
     public function create($product)
     {
         try {
@@ -40,46 +60,13 @@ class ProductModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-
-                $product = new \App\models\Product();
-                $product->setId($result["id"]);
-                $product->setNome($result["nome_produto"]);
-                $product->setDescricao($result["descricao"]);
-                $product->setPrecoCompra($result["preco_compra"]);
-                $product->setPrecoVenda($result["preco_venda"]);
-                $product->setQuantidadeDisponivel($result["quantidade_disponível"]);
-                $product->setLiberadoVenda($result["liberado_venda"]);
-                $product->setIdCategoria($result["id_categoria"]);
-
-                return $product;
+                return ProductModel::ModelFromDBArray($result);
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
-        }
-    }
-
-    public function getRaw($id)
-    {
-        try {
-            $sql = "Select * from produtos where id = ? limit 1";
-            $conn = ProductModel::getConexao();
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $id);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) :
-                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                $result =  $resultset[0];
-                return $result;
-            else :
-                return;
-            endif;
-        } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao buscar produto: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -97,12 +84,19 @@ class ProductModel extends BaseModel
 
             if ($stmt->rowCount() > 0) :
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                return $resultset;
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, ProductModel::ModelFromDBArray($value));
+                }
+
+                return $result;
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao listar produtos: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -129,7 +123,8 @@ class ProductModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao atualizar produto: ' . $e->getMessage());
+            error_log('Erro ao atualizar produto: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -144,7 +139,8 @@ class ProductModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao remover produto: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

@@ -114,7 +114,7 @@ class CategoryController extends BaseController
                 Utils::jsonResponse(500, $data);
             }
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
@@ -142,7 +142,7 @@ class CategoryController extends BaseController
 
             exit();
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
@@ -164,7 +164,7 @@ class CategoryController extends BaseController
 
             exit();
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 }

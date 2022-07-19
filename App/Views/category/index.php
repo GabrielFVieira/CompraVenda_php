@@ -61,7 +61,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= BASE_URL . '/categories' ?>" id="categoryForm" method="POST">
+                <form id="categoryForm">
                     <input type="hidden" id="id" name="id">
                     <div class="form-group">
                         <label for="name">Nome:</label>
@@ -108,6 +108,20 @@ $(document).ready(function() {
         setupFieldValues: setupFieldValues,
         emptyFields: emptyFields
     }
+
+    $("#categoryForm").validate({
+        errorPlacement: function(label, element) {
+            label.addClass('error-msg text-danger');
+            label.insertAfter(element);
+        },
+        wrapper: 'span',
+        rules: {
+            name: {
+                required: true,
+                maxlength: 50,
+            },
+        },
+    });
 
     setupDocument(options);
 });

@@ -9,7 +9,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= BASE_URL . '/products' ?>" id="productForm" method="POST">
+                <form id="productForm">
+                    <input type="hidden" id="id" name="id">
                     <div class="form-group">
                         <label for="name">Nome:</label>
                         <input type="text" class="form-control" id="name" name="name" maxlength="100">
@@ -26,7 +27,7 @@
                             if (isset($data['categories'])) {
                                 foreach ($data['categories'] as $category) {
                             ?>
-                            <option value="<?= $category['id'] ?>"><?= $category['nome_categoria'] ?></option>
+                            <option value="<?= $category->getId() ?>"><?= $category->getNome() ?></option>
                             <?php
                                 }
                             }
@@ -43,8 +44,8 @@
                                 placeholder="000,00" />
                         </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="active" id="active" value="true">
+                    <div class="form-check mt-4">
+                        <input class="form-check-input" type="checkbox" name="active" id="active" value="false">
                         <label class="form-check-label" for="active">
                             Liberar para venda
                         </label>
@@ -90,16 +91,13 @@ $(document).ready(function() {
             category: {
                 required: true,
             },
-            active: {
-                required: true,
-            },
             sellValue: {
                 required: true,
             },
         }
     });
 
-    $('#sellValue').mask('0.000.000.000,00', {
+    $('#sellValue').mask('0000000000.00', {
         reverse: true
     });
 });

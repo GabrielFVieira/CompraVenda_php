@@ -17,22 +17,8 @@ const handleError = data => {
 	});
 };
 
-const setupDocument = data => {
-	const { resource, path, formId, btnNewId, btnEditId, btnDeleteId, modelId, setupFieldValues, emptyFields } = data;
-
-	$(formId).validate({
-		errorPlacement: function (label, element) {
-			label.addClass('error-msg text-danger');
-			label.insertAfter(element);
-		},
-		wrapper: 'span',
-		rules: {
-			name: {
-				required: true,
-				maxlength: 50,
-			},
-		},
-	});
+const setupDocument = options => {
+	const { resource, path, formId, btnNewId, btnEditId, btnDeleteId, modelId, setupFieldValues, emptyFields } = options;
 
 	$(formId).submit(function (e) {
 		e.preventDefault();
@@ -40,33 +26,42 @@ const setupDocument = data => {
 		var form = $(this);
 		var id = $('#id').val();
 
-		$.ajax({
-			type: id ? 'PUT' : 'POST',
-			url: id ? path + '/' + id : path,
-			data: form.serialize(),
-			dataType: 'JSON',
-			success: function (data) {
-				Swal.fire({
-					title: 'Sucesso',
-					text: resource + (id ? ' atualizado(a)' : ' cadastrado(a)') + ' com sucesso',
-					icon: 'success',
-				}).then(() => {
-					location.reload();
-				});
-			},
-			error: function (data) {
-				handleError(data);
-				emptyFields();
-			},
-		});
+		var validator = form.validate();
+		if (validator.form()) {
+			$.ajax({
+				type: id ? 'PUT' : 'POST',
+				url: id ? path + '/' + id : path,
+				data: form.serialize(),
+				dataType: 'JSON',
+				success: function (data) {
+					Swal.fire({
+						title: 'Sucesso',
+						text: resource + (id ? ' atualizado(a)' : ' cadastrado(a)') + ' com sucesso',
+						icon: 'success',
+					}).then(() => {
+						location.reload();
+					});
+				},
+				error: function (data) {
+					handleError(data);
+					emptyFields();
+				},
+			});
+		}
 	});
 
 	$(btnNewId).on('click', function () {
+		var validator = $(formId).validate();
+		validator.resetForm();
+
 		emptyFields();
 		$(modelId).modal('show');
 	});
 
 	$(document).on('click', btnEditId, function () {
+		var validator = $(formId).validate();
+		validator.resetForm();
+
 		var id = $(this).attr('data-id');
 
 		$.ajax({
@@ -104,7 +99,7 @@ const setupDocument = data => {
 					success: function (data) {
 						Swal.fire({
 							title: 'Sucesso',
-							text: resource + ' excluida com sucesso',
+							text: resource + ' excluido(a) com sucesso',
 							icon: 'success',
 						}).then(() => {
 							location.reload();

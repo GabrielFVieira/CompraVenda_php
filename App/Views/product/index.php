@@ -1,27 +1,5 @@
 <?php
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
-
-<?php
-    if (isset($data['errors'])) { ?>
-<div class="w-100">
-    <div class="mt-5 alert alert-danger alert-dismissible fade show text-center" role="alert"
-        style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
-        <?php
-
-                foreach ($data['errors'] as $error) {
-                    echo $error . "<br>";
-                }
-
-                ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-</div>
-<?php
-    }
-    ?>
-
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div class="vh-100 p-4 d-flex flex-column">
@@ -54,20 +32,20 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                             foreach ($data['products'] as $product) {
                         ?>
                     <tr>
-                        <td><?= $product['nome_produto'] ?></td>
-                        <td><?= $product['descricao'] ?></td>
-                        <td>R$<?= $product['preco_compra'] ?></td>
-                        <td>R$<?= $product['preco_venda'] ?></td>
-                        <td><?= $product['quantidade_disponível'] ?></td>
-                        <td><?= $product['nome_categoria'] ?></td>
-                        <td><?= $product['liberado_venda'] ?></td>
+                        <td><?= $product->getNome() ?></td>
+                        <td><?= $product->getDescricao() ?></td>
+                        <td>R$<?= $product->getPrecoCompra() ?></td>
+                        <td>R$<?= $product->getPrecoVenda() ?></td>
+                        <td><?= $product->getQuantidadeDisponivel() ?></td>
+                        <td><?= $product->getNomeCategoria() ?></td>
+                        <td><?= $product->getLiberadoVenda() ?></td>
                         <td>
                             <?php
                                         if ($_SESSION['papelUsuario'] == "Comprador") {
                                         ?>
-                            <button type="button" id="btnEdit" data-id="<?= $product['id'] ?>"
+                            <button type="button" id="btnEdit" data-id="<?= $product->getId() ?>"
                                 class="btn btn-outline-primary">Editar</button>
-                            <button type="button" id="btnDelete" data-id="<?= $product['id'] ?>"
+                            <button type="button" id="btnDelete" data-id="<?= $product->getId() ?>"
                                 class="btn btn-outline-danger">Remover</button>
                             <?php
                                         }
@@ -85,100 +63,49 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 </div>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
-
-<?php require_once 'App/Views/product/new.php' ?>
+<script src="<?= URL_JS ?>defaultScripts.js"></script>
+<?php include 'App/Views/product/new.php' ?>
 
 <script>
 $(document).ready(function() {
-    $('#btnNew').on('click', function() {
+    const setupFieldValues = (data) => {
+        $("#id").val(data.id);
+        $("#name").val(data.nome);
+        $("#description").val(data.descricao);
+        $("#category").val(data.idCategoria);
+
+        const active = data.liberadoVenda == "S" ? true : false
+        $("#active").prop("checked", active);
+        $("#amount").val(data.quantidadeDisponivel);
+        $("#sellValue").val(data.precoVenda);
+    }
+
+    const emptyFields = () => {
+        $("#id").val("");
         $("#name").val("");
         $("#description").val("");
-        $("#active").prop("checked", false);
         $("#category").val("");
+        $("#active").prop("checked", false);
 
-        $('#productForm').attr('action', '<?= BASE_URL . '/products' ?>')
-        $("#modalNewProduct").modal('show');
-    })
+        $("#product").val('');
+        $("#provider").val('');
+        $("#amount").val('');
+        $("#sellValue").val('');
+    }
 
-    $(document).on("click", "#btnEdit", function() {
-        var id = $(this).attr("data-id");
+    options = {
+        resource: "Produto",
+        path: "<?= BASE_URL . '/products' ?>",
+        formId: "#productForm",
+        btnNewId: "#btnNew",
+        btnEditId: "#btnEdit",
+        btnDeleteId: "#btnDelete",
+        modelId: "#modalNewProduct",
+        setupFieldValues: setupFieldValues,
+        emptyFields: emptyFields
+    }
 
-        $.ajax({
-            url: "<?= BASE_URL . '/products/' ?>" + id,
-            type: "GET",
-            dataType: "JSON",
-            success: function(data) {
-
-                console.log(data)
-
-                $("#name").val(data.nome_produto);
-                $("#description").val(data.descricao);
-                $("#category").val(data.id_categoria);
-
-                const active = data.liberado_venda == "S" ? true : false
-                $("#active").prop("checked", active);
-
-                $("#description").val(data.descricao);
-                $("#sellValue").val(data.preco_venda);
-
-                $('#productForm').attr('action', '<?= BASE_URL . '/products' ?>/' + id)
-                $("#modalNewProduct").modal('show');
-            },
-            error: function(data) {
-                response = data.responseJSON;
-
-                Swal.fire({
-                    title: "Erro",
-                    text: response.error ? response.error : "Erro Inesperado",
-                    icon: "error",
-                });
-
-                $("#product").val('');
-                $("#provider").val('');
-                $("#amount").val('');
-                $("#value").val('');
-
-                $("#modalNewPurchase").modal('hide');
-            }
-        });
-    })
-
-    $(document).on("click", "#btnDelete", function() {
-        var id = $(this).attr("data-id");
-
-        Swal.fire({
-            title: 'Confirma a exclusão do produto?',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            cancelButtonText: 'Cancelar',
-            confirmButtonText: 'Confirma Exclusão'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?= BASE_URL . '/products/' ?>" + id,
-                    type: "DELETE",
-                    dataType: "JSON",
-                    success: function(data) {
-                        Swal.fire({
-                            title: "Sucesso",
-                            text: "Produto excluido com sucesso",
-                            icon: "success",
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function(data) {
-                        Swal.fire({
-                            title: "Erro",
-                            text: "Erro Inesperado",
-                            icon: "error",
-                        });
-                    }
-                });
-            }
-        })
-    })
+    setupDocument(options);
 });
 </script>
 

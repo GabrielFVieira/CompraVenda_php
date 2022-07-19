@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use \Exception;
+use \App\models\Product;
 use App\Core\BaseController;
 use App\Utils\Utils;
 use GUMP as Validador;
@@ -48,88 +50,101 @@ class ProductController extends BaseController
         $this->view('product/index', $data);
     }
 
+    private function validateInput($data)
+    {
+        $validacao = new Validador("pt-br");
+        $post_filtrado = $validacao->filter($data, $this->filters);
+        $post_validado = $validacao->validate($post_filtrado, $this->rules);
+
+        if ($post_validado === true) :
+            return true;
+        else :
+            $errors = $validacao->get_errors_array();
+
+            $formattedErrors = [];
+            foreach ($errors as $value) {
+                array_push($formattedErrors, $value);
+            }
+
+            $data = ['errors' => $formattedErrors];
+            Utils::jsonResponse(400, $data);
+            return false;
+        endif;
+    }
+
+    private function updateModelValues(&$model, $data)
+    {
+        $model->setNome($data['name']);
+        $model->setDescricao($data['description']);
+
+        if (isset($data['active'])) :
+            $model->setLiberadoVendaBool(boolval($data['active']));
+        else :
+            $model->setLiberadoVendaBool(false);
+        endif;
+
+        $model->setIdCategoria($data['category']);
+
+        $value = str_replace(',', '.', $data['sellValue']);
+        $model->setPrecoVenda(floatval($value));
+        $model->setPrecoCompra(0);
+        $model->setQuantidadeDisponivel(0);
+    }
+
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+            if ($this->validateInput($_POST) == false) {
+                exit();
+            }
 
-            if ($post_validado === true) :
-                $product = new \App\models\Product();
-                $product->setNome($_POST['name']);
-                $product->setDescricao($_POST['description']);
+            $product = new Product();
+            $this->updateModelValues($product, $_POST);
+            $productModel = $this->model('ProductModel');
 
-                if (isset($_POST['active'])) :
-                    $product->setLiberadoVendaBool(boolval($_POST['active']));
-                else :
-                    $product->setLiberadoVendaBool(false);
-                endif;
-
-                $product->setIdCategoria($_POST['category']);
-                $product->setPrecoVenda(floatval($_POST['sellValue']));
-                $product->setPrecoCompra(0);
-                $product->setQuantidadeDisponivel(0);
-
-                $productModel = $this->model('ProductModel');
+            try {
                 $productModel->create($product);
-
-                $messages = ['Produto cadastrado com sucesso'];
-                $data = ['messages' => $messages];
-                Utils::redirect("products");
-            else :
-                $erros = $validacao->get_errors_array();
-                $data = ['errors' => $erros];
-                $this->view('product/index', $data);
-            endif;
+                Utils::jsonResponse();
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
     public function update($path)
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+        if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
+            Utils::loadPutValues($_PUT);
+            if ($this->validateInput($_PUT) == false) {
+                exit();
+            }
 
-            if ($post_validado === true) :
-                $productModel = $this->model('ProductModel');
-                $oldProduct = $productModel->get($path['id']);
+            $productModel = $this->model('ProductModel');
+            $oldProduct = $productModel->get($path['id']);
 
-                if (is_null($oldProduct)) :
-                    $erros = ['Produto não encontrado'];
-                    $data = ['erros' => $erros];
-                    Utils::redirect('products', $data);
-                    exit();
-                endif;
-
-
-                $oldProduct->setNome($_POST['name']);
-                $oldProduct->setDescricao($_POST['description']);
-
-                if (isset($_POST['active'])) :
-                    $oldProduct->setLiberadoVendaBool(boolval($_POST['active']));
-                else :
-                    $oldProduct->setLiberadoVendaBool(false);
-                endif;
-
-                $oldProduct->setIdCategoria($_POST['category']);
-                $oldProduct->setPrecoVenda(floatval($_POST['sellValue']));
-
-                $productModel->update($oldProduct);
-
-                // $messages = ['Produto atualizado com sucesso'];
-                // $data = ['messages' => $messages];
-                Utils::redirect('products');
-            else :
-                $erros = $validacao->get_errors_array();
+            if (is_null($oldProduct)) :
+                $erros = ['Produto não encontrado'];
                 $data = ['erros' => $erros];
-                $this->view('product/index', $data);
+                Utils::redirect('products', $data);
+                exit();
             endif;
+
+            $this->updateModelValues($oldProduct, $_PUT);
+
+            try {
+                $productModel->update($oldProduct);
+                Utils::jsonResponse();
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
@@ -137,18 +152,22 @@ class ProductController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
             $productModel = $this->model('ProductModel');
-            $product = $productModel->getRaw($path['id']);
 
-            if (!is_null($product)) :
-                echo json_encode($product);
-            else :
-                $data = array();
-                $data['error'] = 'Produto não encontrado';
-                http_response_code(404);
-                echo json_encode($data);
-            endif;
+            try {
+                $product = $productModel->get($path['id']);
 
-            exit();
+                if (!is_null($product)) :
+                    Utils::jsonResponse(200, $product);
+                else :
+                    $errors = ['Produto não encontrado'];
+                    $data = ['errors' => $errors];
+                    Utils::jsonResponse(404, $data);
+                endif;
+            } catch (Exception $e) {
+                $errors = ['Erro ao listar produtos'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
             Utils::redirect();
         endif;
@@ -160,14 +179,19 @@ class ProductController extends BaseController
             $id = $data['id'];
 
             $productModel = $this->model('ProductModel');
-            $productModel->remove($id);
 
-            $data = array();
-            $data['status'] = true;
-            echo json_encode($data);
+            try {
+                $productModel->remove($id);
+                Utils::jsonResponse(204);
+            } catch (Exception $e) {
+                $errors = ['Erro ao remover produto'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
+
             exit();
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 }
