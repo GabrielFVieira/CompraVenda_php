@@ -5,6 +5,7 @@ namespace App\Controllers;
 use \Exception;
 use \App\models\Product;
 use App\Core\BaseController;
+use App\models\Role;
 use App\Utils\Utils;
 
 class ProductController extends BaseController
@@ -70,6 +71,10 @@ class ProductController extends BaseController
 
     public function create()
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
             if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
                 exit();
@@ -94,6 +99,10 @@ class ProductController extends BaseController
 
     public function update($path)
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
             Utils::loadPutValues($_PUT);
             if (Utils::validateInputs($_PUT, $this->filters, $this->rules) == false) {
@@ -152,6 +161,10 @@ class ProductController extends BaseController
 
     public function remove($data)
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];

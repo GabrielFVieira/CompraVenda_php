@@ -6,6 +6,7 @@ use \Exception;
 use App\Core\BaseController;
 use App\Utils\Utils;
 use App\models\Provider;
+use App\models\Role;
 
 class ProviderController extends BaseController
 {
@@ -94,6 +95,10 @@ class ProviderController extends BaseController
 
     public function create()
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
             if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
                 exit();
@@ -118,6 +123,10 @@ class ProviderController extends BaseController
 
     public function update($path)
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
             Utils::loadPutValues($_PUT);
             if (Utils::validateInputs($_PUT, $this->filters, $this->rules) == false) {
@@ -151,6 +160,10 @@ class ProviderController extends BaseController
 
     public function remove($data)
     {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];

@@ -3,6 +3,7 @@
 namespace app\utils;
 
 use GUMP as Validador;
+use App\models\Role;
 
 class Utils
 {
@@ -66,5 +67,18 @@ class Utils
             Utils::jsonResponse(400, $data);
             return false;
         endif;
+    }
+
+    public static function hasPermission(string $role)
+    {
+        if ($_SESSION['papelUsuario'] == $role) :
+            return true;
+        endif;
+
+        $errors = ['Usuário não tem permissão para executar essa ação'];
+        $data = ['errors' => $errors];
+        Utils::jsonResponse(403, $data);
+
+        return false;
     }
 }
