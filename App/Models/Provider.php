@@ -2,7 +2,7 @@
 
 namespace App\models;
 
-class Provider
+class Provider implements \JsonSerializable
 {
     private $id, $razaoSocial, $cnpj, $endereco, $bairro, $cidade, $uf, $cep, $telefone, $email;
 
@@ -107,7 +107,7 @@ class Provider
 
     public function setTelefone($telefone)
     {
-        $this->cep = $telefone;
+        $this->telefone = $telefone;
     }
 
     public function getEmail()
@@ -118,5 +118,10 @@ class Provider
     public function setEmail($email)
     {
         $this->email = $email;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

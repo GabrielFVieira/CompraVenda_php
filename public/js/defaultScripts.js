@@ -82,7 +82,7 @@ const setupDocument = options => {
 		var id = $(this).attr('data-id');
 
 		Swal.fire({
-			title: 'Confirma a exclusão da ' + resource + '?',
+			title: 'Confirma a exclusão do(a) ' + resource + '?',
 			showCancelButton: true,
 			confirmButtonColor: '#3085d6',
 			cancelButtonColor: '#d33',

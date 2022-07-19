@@ -34,7 +34,7 @@
                             if (isset($data['providers'])) {
                                 foreach ($data['providers'] as $provider) {
                             ?>
-                            <option value="<?= $provider['id'] ?>"><?= $provider['razao_social'] ?></option>
+                            <option value="<?= $provider->getId() ?>"><?= $provider->getRazaoSocial() ?></option>
                             <?php
                                 }
                             }

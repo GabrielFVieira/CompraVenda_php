@@ -5,6 +5,48 @@ use App\models\Provider;
 
 class ProviderModel extends BaseModel
 {
+    private static function ModelFromDBArray($array)
+    {
+        $provider = new Provider();
+        $provider->setId($array["id"]);
+        $provider->setRazaoSocial($array["razao_social"]);
+        $provider->setCNPJ($array["cnpj"]);
+        $provider->setEndereco($array["endereco"]);
+        $provider->setBairro($array["bairro"]);
+        $provider->setCidade($array["cidade"]);
+        $provider->setUF($array["uf"]);
+        $provider->setCEP($array["cep"]);
+        $provider->setTelefone($array["telefone"]);
+        $provider->setEmail($array["email"]);
+
+        return $provider;
+    }
+
+    public function create(Provider $provider)
+    {
+        try {
+            $sql = "INSERT INTO fornecedores(razao_social,cnpj,endereco,
+                    bairro,cidade,uf,cep,telefone,email) VALUES (?,?,?,?,?,?,?,?,?)";
+            $conn = ProviderModel::getConexao();
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(1, $provider->getRazaoSocial());
+            $stmt->bindValue(2, $provider->getCNPJ());
+            $stmt->bindValue(3, $provider->getEndereco());
+            $stmt->bindValue(4, $provider->getBairro());
+            $stmt->bindValue(5, $provider->getCidade());
+            $stmt->bindValue(6, $provider->getUF());
+            $stmt->bindValue(7, $provider->getCEP());
+            $stmt->bindValue(8, $provider->getTelefone());
+            $stmt->bindValue(9, $provider->getEmail());
+            $stmt->execute();
+            $conn = null;
+        } catch (PDOException $e) {
+            error_log('Erro ao cadastrar fornecedor: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function get(int $id)
     {
         try {
@@ -19,12 +61,13 @@ class ProviderModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return $result;
+                return ProviderModel::ModelFromDBArray($result);
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao buscar fornecedor: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -40,14 +83,18 @@ class ProviderModel extends BaseModel
             if ($stmt->rowCount() > 0) :
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, ProviderModel::ModelFromDBArray($value));
+                }
 
-
-                return $resultset;
+                return $result;
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao listar fornecedores: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -62,7 +109,8 @@ class ProviderModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao remover fornecedor: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -92,7 +140,8 @@ class ProviderModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao atualizar fornecedor: ' . $e->getMessage());
+            error_log('Erro ao atualizar fornecedor: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

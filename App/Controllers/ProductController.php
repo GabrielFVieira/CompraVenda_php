@@ -49,7 +49,7 @@ class ProductController extends BaseController
         $this->view('product/index', $data);
     }
 
-    private function updateModelValues(&$model, $data)
+    private function updateModelValues(Product &$model, $data)
     {
         $model->setNome($data['name']);
         $model->setDescricao($data['description']);

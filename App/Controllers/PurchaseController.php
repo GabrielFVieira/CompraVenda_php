@@ -52,7 +52,7 @@ class PurchaseController extends BaseController
         $this->view('purchase/index', $data);
     }
 
-    private function updateModelValues(&$model, $data)
+    private function updateModelValues(Purchase &$model, $data)
     {
         $model->setIdFuncionario($_SESSION['id']);
         $model->setIdProduto($data['product']);

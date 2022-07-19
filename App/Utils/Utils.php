@@ -35,7 +35,7 @@ class Utils
     {
         http_response_code($status);
         if (!is_null($json)) :
-            echo json_encode($json);
+            echo json_encode($json, JSON_UNESCAPED_SLASHES);
         else :
             echo json_encode(array());
         endif;
