@@ -18,9 +18,20 @@ const handleError = data => {
 };
 
 const setupDocument = options => {
-	const { resource, path, formId, btnNewId, btnEditId, btnDeleteId, modelId, setupFieldValues, emptyFields } = options;
+	const {
+		resource,
+		path,
+		formId,
+		btnNewId,
+		btnEditId,
+		btnDeleteId,
+		modelId,
+		setupFieldValues,
+		emptyFields,
+		redirectTo,
+	} = options;
 
-	$(formId).submit(function (e) {
+	$(formId).on('submit', function (e) {
 		e.preventDefault();
 
 		var form = $(this);
@@ -39,7 +50,11 @@ const setupDocument = options => {
 						text: resource + (id ? ' atualizado(a)' : ' cadastrado(a)') + ' com sucesso',
 						icon: 'success',
 					}).then(() => {
-						location.reload();
+						if (redirectTo) {
+							location.href = redirectTo;
+						} else {
+							location.reload();
+						}
 					});
 				},
 				error: function (data) {

@@ -53,21 +53,41 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 </div>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
-
-<?php require_once 'App/Views/purchase/new.php' ?>
+<script src="<?= URL_JS ?>defaultScripts.js"></script>
+<?php include 'App/Views/purchase/new.php' ?>
 
 <script>
 $(document).ready(function() {
-    $('#btnNewPurchase').on('click', function() {
+    const setupFieldValues = (data) => {
+        $("#id").val(data.id);
+        $("#product").val(data.idProduto);
+        $("#provider").val(data.idFornecedor);
+        $("#amount").val(data.quantidadeCompra);
+        $("#value").val(data.valorCompra);
+    }
+
+    const emptyFields = () => {
+        $("#id").val("");
         $("#product").val("");
         $("#provider").val("");
         $("#amount").val("");
         $("#value").val("");
-        $("#mensagem_erro").html("");
-        $("#mensagem_erro").removeClass("alert alert-danger")
+    }
 
-        $("#modalNewPurchase").modal('show');
-    })
+    options = {
+        resource: "Compra",
+        path: "<?= BASE_URL . '/purchases' ?>",
+        formId: "#purchaseForm",
+        btnNewId: "#btnNewPurchase",
+        btnEditId: "#btnEdit",
+        btnDeleteId: "#btnDelete",
+        modelId: "#modalNewPurchase",
+        setupFieldValues: setupFieldValues,
+        emptyFields: emptyFields,
+        redirectTo: "<?= BASE_URL . '/purchases' ?>"
+    }
+
+    setupDocument(options);
 });
 </script>
 
