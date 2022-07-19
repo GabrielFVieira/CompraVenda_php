@@ -24,7 +24,7 @@ class ProductModel extends BaseModel
         return $product;
     }
 
-    public function create($product)
+    public function create(Product $product)
     {
         try {
             $sql = "INSERT INTO produtos(nome_produto,descricao,preco_compra,
@@ -46,7 +46,7 @@ class ProductModel extends BaseModel
         }
     }
 
-    public function get($id)
+    public function get(int $id)
     {
         try {
             $sql = "Select * from produtos where id = ? limit 1";
@@ -100,7 +100,7 @@ class ProductModel extends BaseModel
         }
     }
 
-    public function update($product)
+    public function update(Product $product)
     {
         try {
             $sql = "UPDATE produtos SET
@@ -128,7 +128,7 @@ class ProductModel extends BaseModel
         }
     }
 
-    public function remove($id)
+    public function remove(int $id)
     {
         try {
             $sql = "DELETE FROM produtos WHERE id = ?";

@@ -2,7 +2,7 @@
 
 namespace App\models;
 
-class Purchase
+class Purchase implements \JsonSerializable
 {
     private $id, $quantidadeCompra, $valorCompra, $idFornecedor, $nomeFornecedor,
         $idProduto, $nomeProduto, $idFuncionario, $nomeFuncionario, $dataCompra;
@@ -119,5 +119,10 @@ class Purchase
     public function setData($dataCompra)
     {
         $this->dataCompra = $dataCompra;
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

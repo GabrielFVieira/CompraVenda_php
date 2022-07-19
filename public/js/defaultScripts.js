@@ -44,7 +44,6 @@ const setupDocument = options => {
 				},
 				error: function (data) {
 					handleError(data);
-					emptyFields();
 				},
 			});
 		}
@@ -75,7 +74,6 @@ const setupDocument = options => {
 			},
 			error: function (data) {
 				handleError(data);
-				emptyFields();
 			},
 		});
 	});
@@ -107,7 +105,6 @@ const setupDocument = options => {
 					},
 					error: function (data) {
 						handleError(data);
-						emptyFields();
 					},
 				});
 			}

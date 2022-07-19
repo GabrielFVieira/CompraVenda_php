@@ -6,7 +6,6 @@ use \Exception;
 use App\Core\BaseController;
 use App\Utils\Utils;
 use App\models\Category;
-use GUMP as Validador;
 
 class CategoryController extends BaseController
 {
@@ -39,32 +38,10 @@ class CategoryController extends BaseController
         $this->view('category/index', $data);
     }
 
-    private function validateInput($data)
-    {
-        $validacao = new Validador("pt-br");
-        $post_filtrado = $validacao->filter($data, $this->filters);
-        $post_validado = $validacao->validate($post_filtrado, $this->rules);
-
-        if ($post_validado === true) :
-            return true;
-        else :
-            $errors = $validacao->get_errors_array();
-
-            $formattedErrors = [];
-            foreach ($errors as $value) {
-                array_push($formattedErrors, $value);
-            }
-
-            $data = ['errors' => $formattedErrors];
-            Utils::jsonResponse(400, $data);
-            return false;
-        endif;
-    }
-
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            if ($this->validateInput($_POST) == false) {
+            if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
                 exit();
             }
 
@@ -89,7 +66,7 @@ class CategoryController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
             Utils::loadPutValues($_PUT);
-            if ($this->validateInput($_PUT) == false) {
+            if (Utils::validateInputs($_PUT, $this->filters, $this->rules) == false) {
                 exit();
             }
 
@@ -135,7 +112,7 @@ class CategoryController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao listar categorias'];
+                $errors = ['Erro ao buscar categoria'];
                 $data = ['errors' => $errors];
                 Utils::jsonResponse(500, $data);
             }
@@ -149,11 +126,9 @@ class CategoryController extends BaseController
     public function remove($data)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
-            $id = $data['id'];
-
-            $categoryModel = $this->model('CategoryModel');
-
             try {
+                $id = $data['id'];
+                $categoryModel = $this->model('CategoryModel');
                 $categoryModel->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {

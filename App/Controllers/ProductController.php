@@ -6,7 +6,6 @@ use \Exception;
 use \App\models\Product;
 use App\Core\BaseController;
 use App\Utils\Utils;
-use GUMP as Validador;
 
 class ProductController extends BaseController
 {
@@ -50,28 +49,6 @@ class ProductController extends BaseController
         $this->view('product/index', $data);
     }
 
-    private function validateInput($data)
-    {
-        $validacao = new Validador("pt-br");
-        $post_filtrado = $validacao->filter($data, $this->filters);
-        $post_validado = $validacao->validate($post_filtrado, $this->rules);
-
-        if ($post_validado === true) :
-            return true;
-        else :
-            $errors = $validacao->get_errors_array();
-
-            $formattedErrors = [];
-            foreach ($errors as $value) {
-                array_push($formattedErrors, $value);
-            }
-
-            $data = ['errors' => $formattedErrors];
-            Utils::jsonResponse(400, $data);
-            return false;
-        endif;
-    }
-
     private function updateModelValues(&$model, $data)
     {
         $model->setNome($data['name']);
@@ -94,7 +71,7 @@ class ProductController extends BaseController
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            if ($this->validateInput($_POST) == false) {
+            if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
                 exit();
             }
 
@@ -119,7 +96,7 @@ class ProductController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
             Utils::loadPutValues($_PUT);
-            if ($this->validateInput($_PUT) == false) {
+            if (Utils::validateInputs($_PUT, $this->filters, $this->rules) == false) {
                 exit();
             }
 
@@ -164,7 +141,7 @@ class ProductController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao listar produtos'];
+                $errors = ['Erro ao buscar produto'];
                 $data = ['errors' => $errors];
                 Utils::jsonResponse(500, $data);
             }
@@ -176,11 +153,9 @@ class ProductController extends BaseController
     public function remove($data)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
-            $id = $data['id'];
-
-            $productModel = $this->model('ProductModel');
-
             try {
+                $id = $data['id'];
+                $productModel = $this->model('ProductModel');
                 $productModel->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {

@@ -9,7 +9,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="<?= BASE_URL . '/purchases' ?>" id="purchaseForm" method="POST">
+                <form id="purchaseForm">
+                    <input type="hidden" id="id" name="id">
                     <div class="form-group">
                         <label for="product">Produto:</label>
                         <select class="form-control" name="product" id="product">
@@ -18,7 +19,7 @@
                             if (isset($data['products'])) {
                                 foreach ($data['products'] as $product) {
                             ?>
-                            <option value="<?= $product['id'] ?>"><?= $product['nome_produto'] ?></option>
+                            <option value="<?= $product->getId() ?>"><?= $product->getNome() ?></option>
                             <?php
                                 }
                             }

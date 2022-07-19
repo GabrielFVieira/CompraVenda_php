@@ -1,10 +1,37 @@
 <?php
 
 use App\Core\BaseModel;
+use App\models\Purchase;
 
 class PurchaseModel extends BaseModel
 {
-    public function create($purchase)
+    private static function ModelFromDBArray($array)
+    {
+        $product = new Purchase();
+        $product->setId($array["id"]);
+        $product->setQuantidade($array["quantidade_compra"]);
+        $product->setData($array["data_compra"]);
+        $product->setValor($array["valor_compra"]);
+        $product->setIdFornecedor($array["id_fornecedor"]);
+        $product->setIdProduto($array["id_produto"]);
+        $product->setIdFuncionario($array["id_funcionario"]);
+
+        if (isset($array["fornecedor"])) {
+            $product->setNomeFornecedor($array["fornecedor"]);
+        }
+
+        if (isset($array["nome_produto"])) {
+            $product->setNomeProduto($array["nome_produto"]);
+        }
+
+        if (isset($array["nome_funcionario"])) {
+            $product->setNomeFuncionario($array["nome_funcionario"]);
+        }
+
+        return $product;
+    }
+
+    public function create(Purchase $purchase)
     {
         try {
             $sql = "INSERT INTO compras(quantidade_compra,data_compra,valor_compra,
@@ -21,11 +48,12 @@ class PurchaseModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao cadastrar compra: ' . $e->getMessage());
+            error_log('Erro ao cadastrar compra: ' . $e->getMessage());
+            throw $e;
         }
     }
 
-    public function update($purchase)
+    public function update(Purchase $purchase)
     {
         try {
             $sql = "UPDATE compras SET 
@@ -46,11 +74,12 @@ class PurchaseModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            die('Erro ao atualizar compra: ' . $e->getMessage());
+            error_log('Erro ao atualizar compra: ' . $e->getMessage());
+            throw $e;
         }
     }
 
-    public function get($id)
+    public function get(int $id)
     {
         try {
             $sql = "Select * from compras where id = ? limit 1";
@@ -64,12 +93,13 @@ class PurchaseModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return $result;
+                return PurchaseModel::ModelFromDBArray($result);
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao buscar compra: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -92,16 +122,24 @@ class PurchaseModel extends BaseModel
 
             if ($stmt->rowCount() > 0) :
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                return $resultset;
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, PurchaseModel::ModelFromDBArray($value));
+                }
+
+                return $result;
+
             else :
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao listar compras: ' . $e->getMessage());
+            throw $e;
         }
     }
 
-    public function remove($id)
+    public function remove(int $id)
     {
         try {
             $sql = "DELETE FROM compras WHERE id = ?";
@@ -112,7 +150,8 @@ class PurchaseModel extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao remover compra: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

@@ -30,22 +30,22 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                     <?php
                         if (isset($data['purchases'])) {
                             foreach ($data['purchases'] as $purchase) {
-                                $date = date_create($purchase['data_compra']);
+                                $date = date_create($purchase->getData());
                         ?>
                     <tr>
-                        <td><?= $purchase['nome_produto'] ?></td>
-                        <td><?= $purchase['fornecedor'] ?></td>
-                        <td><?= $purchase['nome_funcionario'] ?></td>
+                        <td><?= $purchase->getNomeProduto() ?></td>
+                        <td><?= $purchase->getNomeFornecedor() ?></td>
+                        <td><?= $purchase->getNomeFuncionario() ?></td>
                         <td><?= date_format($date, 'd/m/Y') ?></td>
-                        <td><?= $purchase['quantidade_compra'] ?></td>
-                        <td>R$<?= $purchase['valor_compra'] ?></td>
+                        <td><?= $purchase->getQuantidade() ?></td>
+                        <td>R$<?= $purchase->getValor() ?></td>
                         <td>
                             <?php
-                                        if ($purchase['id_funcionario'] == $_SESSION['id']) {
+                                        if ($purchase->getIdFuncionario() == $_SESSION['id']) {
                                         ?>
-                            <button type="button" id="btnEdit" data-id="<?= $purchase['id'] ?>"
+                            <button type="button" id="btnEdit" data-id="<?= $purchase->getId() ?>"
                                 class="btn btn-outline-primary">Editar</button>
-                            <button type="button" id="btnDelete" data-id="<?= $purchase['id'] ?>"
+                            <button type="button" id="btnDelete" data-id="<?= $purchase->getId() ?>"
                                 class="btn btn-outline-danger">Remover</button>
                             <?php
                                         }
@@ -63,93 +63,40 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 </div>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
-
-<?php require_once 'App/Views/purchase/new.php' ?>
+<script src="<?= URL_JS ?>defaultScripts.js"></script>
+<?php include 'App/Views/purchase/new.php' ?>
 
 <script>
 $(document).ready(function() {
-    $('#btnNew').on('click', function() {
+    const setupFieldValues = (data) => {
+        $("#id").val(data.id);
+        $("#product").val(data.idProduto);
+        $("#provider").val(data.idFornecedor);
+        $("#amount").val(data.quantidadeCompra);
+        $("#value").val(data.valorCompra);
+    }
+
+    const emptyFields = () => {
+        $("#id").val("");
         $("#product").val("");
         $("#provider").val("");
         $("#amount").val("");
         $("#value").val("");
+    }
 
-        $('#purchaseForm').attr('action', '<?= BASE_URL . '/purchases' ?>')
-        $("#modalNewPurchase").modal('show');
-    })
+    options = {
+        resource: "Compra",
+        path: "<?= BASE_URL . '/purchases' ?>",
+        formId: "#purchaseForm",
+        btnNewId: "#btnNew",
+        btnEditId: "#btnEdit",
+        btnDeleteId: "#btnDelete",
+        modelId: "#modalNewPurchase",
+        setupFieldValues: setupFieldValues,
+        emptyFields: emptyFields
+    }
 
-    $(document).on("click", "#btnEdit", function() {
-        var id = $(this).attr("data-id");
-
-        $.ajax({
-            url: "<?= BASE_URL . '/purchases/' ?>" + id,
-            type: "GET",
-            dataType: "JSON",
-            success: function(data) {
-                $("#product").val(data.id_produto);
-                $("#provider").val(data.id_fornecedor);
-                $("#amount").val(data.quantidade_compra);
-                $("#value").val(data.valor_compra);
-
-                $('#purchaseForm').attr('action', '<?= BASE_URL . '/purchases' ?>/' + id)
-                $("#modalNewPurchase").modal('show');
-            },
-            error: function(data) {
-                response = data.responseJSON;
-
-                Swal.fire({
-                    title: "Erro",
-                    text: response.error ? response.error : "Erro Inesperado",
-                    icon: "error",
-                });
-
-                $("#product").val('');
-                $("#provider").val('');
-                $("#amount").val('');
-                $("#value").val('');
-
-                $("#modalNewPurchase").modal('hide');
-            }
-        });
-    })
-
-    $(document).on("click", "#btnDelete", function() {
-        var id = $(this).attr("data-id");
-
-        Swal.fire({
-            title: 'Confirma a exclusão da compra?',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            cancelButtonText: 'Cancelar',
-            confirmButtonText: 'Confirma Exclusão'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "<?= BASE_URL . '/purchases/' ?>" + id,
-                    type: "DELETE",
-                    dataType: "JSON",
-                    success: function(data) {
-                        Swal.fire({
-                            title: "Sucesso",
-                            text: "Compra excluida com sucesso",
-                            icon: "success",
-                        }).then(() => {
-                            location.reload();
-                        });
-                    },
-                    error: function(data) {
-                        Swal.fire({
-                            title: "Erro",
-                            text: "Erro Inesperado",
-                            icon: "error",
-                        });
-                    }
-                });
-            }
-        })
-    })
+    setupDocument(options);
 });
 </script>
-
 <?php endif; ?>

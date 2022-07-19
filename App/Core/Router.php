@@ -38,7 +38,7 @@ $route->delete("/products/{id}", "ProductController:remove");
 $route->get("/purchases", "PurchaseController:index");
 $route->post("/purchases", "PurchaseController:create");
 $route->get("/purchases/{id}", "PurchaseController:find");
-$route->post("/purchases/{id}", "PurchaseController:update");
+$route->put("/purchases/{id}", "PurchaseController:update");
 $route->delete("/purchases/{id}", "PurchaseController:remove");
 
 $route->get("/categories", "CategoryController:index");
@@ -49,7 +49,9 @@ $route->delete("/categories/{id}", "CategoryController:remove");
 
 $route->get("/providers", "ProviderController:index");
 $route->post("/providers", "ProviderController:create");
+$route->get("/providers/{id}", "ProviderController:find");
 $route->put("/providers/{id}", "ProviderController:update");
+$route->delete("/providers/{id}", "ProviderController:remove");
 
 /**
  * ERROR

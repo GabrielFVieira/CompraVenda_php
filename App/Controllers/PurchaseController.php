@@ -2,9 +2,10 @@
 
 namespace App\Controllers;
 
+use \Exception;
 use App\Core\BaseController;
+use \App\models\Purchase;
 use App\Utils\Utils;
-use GUMP as Validador;
 
 class PurchaseController extends BaseController
 {
@@ -51,133 +52,131 @@ class PurchaseController extends BaseController
         $this->view('purchase/index', $data);
     }
 
+    private function updateModelValues(&$model, $data)
+    {
+        $model->setIdFuncionario($_SESSION['id']);
+        $model->setIdProduto($data['product']);
+        $model->setIdFornecedor($data['provider']);
+        $model->setQuantidade($data['amount']);
+        $model->setValor(floatval($data['value']));
+    }
+
     public function create()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+            if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
+                exit();
+            }
 
-            if ($post_validado === true) :
-                $purchase = new \App\models\Purchase();
-                $purchase->setIdFuncionario($_SESSION['id']);
-                $purchase->setIdProduto($_POST['product']);
-                $purchase->setIdFornecedor($_POST['provider']);
-                $purchase->setQuantidade($_POST['amount']);
-                $purchase->setValor(floatval($_POST['value']));
-                $purchase->setData(date("Y-m-d"));
+            $purchase = new Purchase();
+            $this->updateModelValues($purchase, $_POST);
+            $purchase->setData(date("Y-m-d"));
 
-                $productModel = $this->model('ProductModel');
-                $product = $productModel->get($purchase->getIdProduto());
+            $productModel = $this->model('ProductModel');
+            $product = $productModel->get($purchase->getIdProduto());
 
-                if (is_null($product)) :
-                    $erros = ['Produto não encontrado'];
-                    $data = ['erros' => $erros];
-                    $this->view('purchases', $data);
-                else :
-                    $purchaseModel = $this->model('PurchaseModel');
-                    $purchaseModel->create($purchase);
-
-                    $newQtd = $product->getQuantidadeDisponivel() + $purchase->getQuantidade();
-                    $product->setQuantidadeDisponivel($newQtd);
-                    $product->setPrecoCompra($purchase->getValor());
-
-                    $productModel->update($product);
-
-                    // $messages = ['Compra cadastrada com sucesso'];
-                    // $data = ['messages' => $messages];
-                    Utils::redirect('purchases');
-                endif;
-
-            else :
-                $erros = $validacao->get_errors_array();
-                $data = ['erros' => $erros];
-                $this->view('purchases', $data);
+            if (is_null($product)) :
+                $errors = ['Produto não encontrado'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+                exit();
             endif;
+
+
+            try {
+                $purchaseModel = $this->model('PurchaseModel');
+                $purchaseModel->create($purchase);
+
+                $newQtd = $product->getQuantidadeDisponivel() + $purchase->getQuantidade();
+                $product->setQuantidadeDisponivel($newQtd);
+                $product->setPrecoCompra($purchase->getValor());
+
+                $productModel->update($product);
+
+                Utils::jsonResponse();
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
     public function update($path)
     {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') :
-            $validacao = new Validador("pt-br");
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+        if ($_SERVER['REQUEST_METHOD'] == 'PUT') :
+            Utils::loadPutValues($_PUT);
+            if (Utils::validateInputs($_PUT, $this->filters, $this->rules) == false) {
+                exit();
+            }
 
-            if ($post_validado === true) :
-                $purchaseModel = $this->model('PurchaseModel');
-                $oldPurchase = $purchaseModel->get($path['id']);
+            $purchaseModel = $this->model('PurchaseModel');
+            $oldPurchase = $purchaseModel->get($path['id']);
 
-                if (is_null($oldPurchase)) :
-                    // $erros = ['Compra não encontrado'];
-                    // $data = ['erros' => $erros];
-                    Utils::redirect('purchases');
-                    exit();
-                endif;
-
-                $productModel = $this->model('ProductModel');
-                $product = $productModel->get($oldPurchase['id_produto']);
-
-                if (is_null($product)) :
-                    $erros = ['Produto não encontrado'];
-                    $data = ['erros' => $erros];
-                    Utils::redirect('purchases', $data);
-                else :
-                    $qtd = $_POST['amount'];
-                    $qtdDiff = $qtd - $oldPurchase['quantidade_compra'];
-
-                    $purchase = new \App\models\Purchase();
-                    $purchase->setIdFuncionario($_SESSION['id']);
-                    $purchase->setIdProduto($_POST['product']);
-                    $purchase->setIdFornecedor($_POST['provider']);
-                    $purchase->setQuantidade($qtd);
-                    $purchase->setValor(floatval($_POST['value']));
-                    $purchase->setData($oldPurchase['data_compra']);
-                    $purchase->setId($oldPurchase['id']);
-
-                    $purchaseModel->update($purchase);
-
-                    $newQtd = $product->getQuantidadeDisponivel() + $qtdDiff;
-                    $product->setQuantidadeDisponivel($newQtd);
-                    $product->setPrecoCompra($purchase->getValor());
-
-                    $productModel->update($product);
-
-                    // $messages = ['Compra atualizada com sucesso'];
-                    // $data = ['messages' => $messages];
-                    Utils::redirect('purchases');
-                endif;
-
-            else :
-                $erros = $validacao->get_errors_array();
-                $data = ['erros' => $erros];
-                $this->view('purchases', $data);
+            if (is_null($oldPurchase)) :
+                $errors = ['Compra não encontrada'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+                exit();
             endif;
+
+            $productModel = $this->model('ProductModel');
+            $product = $productModel->get($oldPurchase->getIdProduto());
+
+            if (is_null($product)) :
+                $errors = ['Produto não encontrado'];
+                $data = ['erros' => $errors];
+                Utils::jsonResponse(500, $data);
+                exit();
+            endif;
+
+            $qtd = $_PUT['amount'];
+            $qtdDiff = $qtd - $oldPurchase->getQuantidade();
+
+            $this->updateModelValues($oldPurchase, $_PUT);
+
+            try {
+                $purchaseModel->update($oldPurchase);
+
+                $newQtd = $product->getQuantidadeDisponivel() + $qtdDiff;
+                $product->setQuantidadeDisponivel($newQtd);
+                $product->setPrecoCompra($oldPurchase->getValor());
+
+                $productModel->update($product);
+
+                Utils::jsonResponse();
+            } catch (Exception $e) {
+                $errors = [$e->getMessage()];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
-            Utils::redirect();
+            Utils::jsonResponse(405);
         endif;
     }
 
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $id = $path['id'];
-
             $purchaseModel = $this->model('PurchaseModel');
-            $purchase = $purchaseModel->get($id);
 
-            if (!is_null($purchase)) :
-                echo json_encode($purchase);
-            else :
-                $data = array();
-                $data['error'] = 'Compra não encontrada';
-                http_response_code(404);
-                echo json_encode($data);
-            endif;
+            try {
+                $purchase = $purchaseModel->get($path['id']);
 
-            exit();
+                if (!is_null($purchase)) :
+                    Utils::jsonResponse(200, $purchase);
+                else :
+                    $errors = ['Compra não encontrada'];
+                    $data = ['errors' => $errors];
+                    Utils::jsonResponse(404, $data);
+                endif;
+            } catch (Exception $e) {
+                $errors = ['Erro ao buscar compra'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
         else :
             Utils::redirect();
         endif;
@@ -186,14 +185,17 @@ class PurchaseController extends BaseController
     public function remove($data)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
-            $id = $data['id'];
+            try {
+                $id = $data['id'];
+                $purchaseModel = $this->model('PurchaseModel');
+                $purchaseModel->remove($id);
+                Utils::jsonResponse(204);
+            } catch (Exception $e) {
+                $errors = ['Erro ao remover compra'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(500, $data);
+            }
 
-            $purchaseModel = $this->model('PurchaseModel');
-            $purchaseModel->remove($id);
-
-            $data = array();
-            $data['status'] = true;
-            echo json_encode($data);
             exit();
         else :
             Utils::redirect();

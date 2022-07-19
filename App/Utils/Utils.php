@@ -2,6 +2,8 @@
 
 namespace app\utils;
 
+use GUMP as Validador;
+
 class Utils
 {
     public static function gerarTokenCSRF()
@@ -42,5 +44,27 @@ class Utils
     public static function loadPutValues(&$variable)
     {
         parse_str(file_get_contents('php://input'), $variable);
+    }
+
+    public static function validateInputs($data, $filters, $rules)
+    {
+        $validacao = new Validador("pt-br");
+        $post_filtrado = $validacao->filter($data, $filters);
+        $post_validado = $validacao->validate($post_filtrado, $rules);
+
+        if ($post_validado === true) :
+            return true;
+        else :
+            $errors = $validacao->get_errors_array();
+
+            $formattedErrors = [];
+            foreach ($errors as $value) {
+                array_push($formattedErrors, $value);
+            }
+
+            $data = ['errors' => $formattedErrors];
+            Utils::jsonResponse(400, $data);
+            return false;
+        endif;
     }
 }
