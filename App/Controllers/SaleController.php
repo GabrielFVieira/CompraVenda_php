@@ -139,6 +139,18 @@ class SaleController extends BaseController
         endif;
     }
 
+    private function validateEdit(Sale $sale)
+    {
+        if ($sale->getEmployeeId() != $_SESSION['id']) :
+            $errors = ['Vendedor não autorizado a editar essa venda'];
+            $data = ['errors' => $errors];
+            Utils::jsonResponse(403, $data);
+            return false;
+        endif;
+
+        return true;
+    }
+
     public function update($path)
     {
         if (Utils::hasPermission(Role::Vendedor) == false) :
@@ -158,6 +170,10 @@ class SaleController extends BaseController
                 $errors = ['Venda não encontrada'];
                 $data = ['errors' => $errors];
                 Utils::jsonResponse(500, $data);
+                exit();
+            endif;
+
+            if ($this->validateEdit($oldSale) == false) :
                 exit();
             endif;
 
@@ -232,6 +248,18 @@ class SaleController extends BaseController
             try {
                 $id = $data['id'];
                 $saleModel = $this->model('SaleModel');
+
+                $sale = $saleModel->get($id);
+                if (!is_null($sale)) :
+                    if ($this->validateEdit($sale) == false) :
+                        exit();
+                    endif;
+                else :
+                    $errors = ['Venda não encontrada'];
+                    $data = ['errors' => $errors];
+                    Utils::jsonResponse(404, $data);
+                endif;
+
                 $saleModel->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {

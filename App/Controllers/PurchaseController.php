@@ -109,6 +109,19 @@ class PurchaseController extends BaseController
         endif;
     }
 
+    private function validateEdit(Purchase $purchase)
+    {
+        if ($purchase->getIdFuncionario() != $_SESSION['id']) :
+            $errors = ['Comprador não autorizado a editar essa compra'];
+            $data = ['errors' => $errors];
+            Utils::jsonResponse(403, $data);
+            return false;
+        endif;
+
+        return true;
+    }
+
+
     public function update($path)
     {
         if (Utils::hasPermission(Role::Comprador) == false) :
@@ -128,6 +141,10 @@ class PurchaseController extends BaseController
                 $errors = ['Compra não encontrada'];
                 $data = ['errors' => $errors];
                 Utils::jsonResponse(500, $data);
+                exit();
+            endif;
+
+            if ($this->validateEdit($oldPurchase) == false) :
                 exit();
             endif;
 
@@ -201,6 +218,19 @@ class PurchaseController extends BaseController
             try {
                 $id = $data['id'];
                 $purchaseModel = $this->model('PurchaseModel');
+
+                $purchase = $purchaseModel->get($id);
+                if (!is_null($purchase)) :
+                    if ($this->validateEdit($purchase) == false) :
+                        exit();
+                    endif;
+                else :
+                    $errors = ['Compra não encontrada'];
+                    $data = ['errors' => $errors];
+                    Utils::jsonResponse(404, $data);
+                endif;
+
+
                 $purchaseModel->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
