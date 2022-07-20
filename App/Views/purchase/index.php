@@ -41,7 +41,10 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                         <td>R$<?= $purchase->getValor() ?></td>
                         <td>
                             <?php
-                                        if ($purchase->getIdFuncionario() == $_SESSION['id']) {
+                                        if (
+                                            $_SESSION['papelUsuario'] == "Comprador" &&
+                                            $purchase->getIdFuncionario() == $_SESSION['id']
+                                        ) {
                                         ?>
                             <button type="button" id="btnEdit" data-id="<?= $purchase->getId() ?>"
                                 class="btn btn-outline-primary">Editar</button>
