@@ -69,9 +69,9 @@ class Utils
         endif;
     }
 
-    public static function hasPermission(string $role)
+    public static function hasPermission(int $role)
     {
-        if ($_SESSION['papelUsuario'] == $role) :
+        if (Role::fromString($_SESSION['papelUsuario']) == $role) :
             return true;
         endif;
 

@@ -8,7 +8,7 @@
                 <span class="tooltip">Dashboard</span>
             </li>
             <li>
-                <a href="<?= BASE_URL . '/' ?>">
+                <a href="<?= BASE_URL . '/sales' ?>">
                     <img src="<?= URL_IMG ?>sales.svg" />
                 </a>
                 <span class="tooltip">Vendas</span>

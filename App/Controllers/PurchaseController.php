@@ -83,7 +83,7 @@ class PurchaseController extends BaseController
             if (is_null($product)) :
                 $errors = ['Produto não encontrado'];
                 $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::jsonResponse(404, $data);
                 exit();
             endif;
 

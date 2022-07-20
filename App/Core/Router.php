@@ -20,14 +20,17 @@ $route->post("/login", "AccessController:login"); // Login endpoint
 $route->get("/", "DashboardController:index"); // Dashboard page
 $route->get("/logout", "AccessController:logout"); // Logout endpoint
 
-// $route->get("/customers", "Customer:index");
-// $route->post("/customers", "Customer:create");
-// $route->put("/customers/{id}", "Customer:update");
+$route->get("/customers", "Customer:index");
+$route->post("/customers", "Customer:create");
+$route->get("/customers/{id}", "Customer:find");
+$route->put("/customers/{id}", "Customer:update");
+$route->delete("/customers/{id}", "Customer:remove");
 
-// $route->get("/sales", "Sales:index");
-// $route->get("/sales/new", "Sales:new");
-// $route->post("/sales", "Sales:create");
-// $route->put("/sales/{id}", "Sales:update");
+$route->get("/sales", "SaleController:index");
+$route->post("/sales", "SaleController:create");
+$route->get("/sales/{id}", "SaleController:find");
+$route->put("/sales/{id}", "SaleController:update");
+$route->delete("/sales/{id}", "SaleController:remove");
 
 $route->get("/products", "ProductController:index");
 $route->post("/products", "ProductController:create");

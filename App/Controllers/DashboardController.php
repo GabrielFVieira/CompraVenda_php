@@ -23,7 +23,8 @@ class DashboardController extends BaseController
 
         switch ($papel) {
             case Role::Vendedor:
-                $this->view('dashboard/seller');
+                $data = $this->getSellerData();
+                $this->view('dashboard/seller', $data);
                 break;
             case Role::Comprador:
                 $data = $this->getBuyerData();
@@ -45,6 +46,22 @@ class DashboardController extends BaseController
 
         $data = [
             'providers' => $providers,
+            'products' => $products
+        ];
+
+        return $data;
+    }
+
+    private function getSellerData()
+    {
+        $customerModel = $this->model('CustomerModel');
+        $customers = $customerModel->list();
+
+        $productModel = $this->model('ProductModel');
+        $products = $productModel->listEnabledForSale();
+
+        $data = [
+            'customers' => $customers,
             'products' => $products
         ];
 

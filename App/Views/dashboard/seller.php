@@ -25,7 +25,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                                 </abutton>
                         </div>
                         <div class="col-3 py-4">
-                            <a href="<?= BASE_URL ?>/"
+                            <a href="<?= BASE_URL ?>/customers"
                                 class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
                                 role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
                                 <p class="m-0 font-weight-bold">Clientes</p>
@@ -51,5 +51,44 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         </div>
     </div>
 </div>
+
+<script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
+<script src="<?= URL_JS ?>defaultScripts.js"></script>
+<?php include 'App/Views/sale/new.php' ?>
+
+<script>
+$(document).ready(function() {
+    const setupFieldValues = (data) => {
+        $("#id").val(data.id);
+        $("#product").val(data.productId);
+        $("#customer").val(data.clientId);
+        $("#amount").val(data.amount);
+        $("#value").val(data.value);
+    }
+
+    const emptyFields = () => {
+        $("#id").val("");
+        $("#product").val("");
+        $("#customer").val("");
+        $("#amount").val("");
+        $("#value").val("");
+    }
+
+    options = {
+        resource: "Venda",
+        path: "<?= BASE_URL . '/sales' ?>",
+        formId: "#saleForm",
+        btnNewId: "#btnNewSale",
+        btnEditId: "#btnEdit",
+        btnDeleteId: "#btnDelete",
+        modelId: "#modalNewSale",
+        setupFieldValues: setupFieldValues,
+        emptyFields: emptyFields,
+        redirectTo: "<?= BASE_URL . '/sales' ?>"
+    }
+
+    setupDocument(options);
+});
+</script>
 
 <?php endif; ?>

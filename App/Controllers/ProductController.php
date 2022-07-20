@@ -65,8 +65,6 @@ class ProductController extends BaseController
 
         $value = str_replace(',', '.', $data['sellValue']);
         $model->setPrecoVenda(floatval($value));
-        $model->setPrecoCompra(0);
-        $model->setQuantidadeDisponivel(0);
     }
 
     public function create()
