@@ -4,10 +4,10 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div class="vh-100 p-4 d-flex flex-column">
         <?php
-            if ($_SESSION['papelUsuario'] == "Comprador") {
+            if ($_SESSION['papelUsuario'] == "Vendedor") {
             ?>
         <button id="btnNew" class="btn text-white" style="border-radius: 14px; background-color: #000;">
-            Novo fornecedor
+            Novo cliente
         </button>
         <?php
             }
@@ -16,7 +16,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th scope="col">Razão Social / CNPJ</th>
+                        <th scope="col">Nome / CPF</th>
                         <th scope="col">Endereço</th>
                         <th scope="col">Telefone</th>
                         <th scope="col">Email</th>
@@ -25,36 +25,36 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                 </thead>
                 <tbody>
                     <?php
-                        if (isset($data['providers'])) {
-                            foreach ($data['providers'] as $provider) {
+                        if (isset($data['customers'])) {
+                            foreach ($data['customers'] as $customer) {
                         ?>
                     <tr>
                         <td>
                             <div style="display: flex; flex-direction: column;">
-                                <p style="margin: 0; font-weight: bold;"><?= $provider->getRazaoSocial() ?></p>
-                                <p style="margin: 0" class="text-muted"><?= $provider->getCNPJ() ?></p>
+                                <p style="margin: 0; font-weight: bold;"><?= $customer->getNome() ?></p>
+                                <p style="margin: 0" class="text-muted"><?= $customer->getCPF() ?></p>
                             </div>
                         </td>
                         <td>
                             <div style="display: flex; flex-direction: column;">
                                 <p style="margin: 0">
-                                    <?= $provider->getEndereco() ?> - <?= $provider->getBairro() ?>
+                                    <?= $customer->getEndereco() ?> - <?= $customer->getBairro() ?>
                                 </p>
                                 <p style="margin: 0" class="text-muted">
-                                    <?= $provider->getCidade() ?> - <?= $provider->getUF() ?>,
-                                    <?= $provider->getCEP() ?>
+                                    <?= $customer->getCidade() ?> - <?= $customer->getUF() ?>,
+                                    <?= $customer->getCEP() ?>
                                 </p>
                             </div>
                         </td>
-                        <td><?= $provider->getTelefone() ?></td>
-                        <td><?= $provider->getEmail() ?></td>
+                        <td><?= $customer->getTelefone() ?></td>
+                        <td><?= $customer->getEmail() ?></td>
                         <td>
                             <?php
-                                        if ($_SESSION['papelUsuario'] == "Comprador") {
+                                        if ($_SESSION['papelUsuario'] == "Vendedor") {
                                         ?>
-                            <button type="button" id="btnEdit" data-id="<?= $provider->getId() ?>"
+                            <button type="button" id="btnEdit" data-id="<?= $customer->getId() ?>"
                                 class="btn btn-outline-primary">Editar</button>
-                            <button type="button" id="btnDelete" data-id="<?= $provider->getId() ?>"
+                            <button type="button" id="btnDelete" data-id="<?= $customer->getId() ?>"
                                 class="btn btn-outline-danger">Remover</button>
                             <?php
                                         }
@@ -73,13 +73,13 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
 <script src="<?= URL_JS ?>defaultScripts.js"></script>
-<?php include 'App/Views/provider/new.php' ?>
+<?php include 'App/Views/customer/new.php' ?>
 <script>
 $(document).ready(function() {
     const setupFieldValues = (data) => {
         $("#id").val(data.id);
-        $("#corporateName").val(data.razaoSocial);
-        $("#cnpj").val(data.cnpj);
+        $("#name").val(data.nome);
+        $("#cpf").val(data.cpf);
         $("#address").val(data.endereco);
         $("#district").val(data.bairro);
         $("#city").val(data.cidade);
@@ -91,8 +91,8 @@ $(document).ready(function() {
 
     const emptyFields = () => {
         $("#id").val("");
-        $("#corporateName").val("");
-        $("#cnpj").val("");
+        $("#name").val("");
+        $("#cpf").val("");
         $("#address").val("");
         $("#district").val("");
         $("#city").val("");
@@ -103,13 +103,13 @@ $(document).ready(function() {
     }
 
     options = {
-        resource: "Fornecedor",
-        path: "<?= BASE_URL . '/providers' ?>",
-        formId: "#providerForm",
+        resource: "Cliente",
+        path: "<?= BASE_URL . '/customers' ?>",
+        formId: "#customerForm",
         btnNewId: "#btnNew",
         btnEditId: "#btnEdit",
         btnDeleteId: "#btnDelete",
-        modelId: "#modalNewProvider",
+        modelId: "#modalNewCustomer",
         setupFieldValues: setupFieldValues,
         emptyFields: emptyFields
     }

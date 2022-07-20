@@ -20,11 +20,11 @@ $route->post("/login", "AccessController:login"); // Login endpoint
 $route->get("/", "DashboardController:index"); // Dashboard page
 $route->get("/logout", "AccessController:logout"); // Logout endpoint
 
-$route->get("/customers", "Customer:index");
-$route->post("/customers", "Customer:create");
-$route->get("/customers/{id}", "Customer:find");
-$route->put("/customers/{id}", "Customer:update");
-$route->delete("/customers/{id}", "Customer:remove");
+$route->get("/customers", "CustomerController:index");
+$route->post("/customers", "CustomerController:create");
+$route->get("/customers/{id}", "CustomerController:find");
+$route->put("/customers/{id}", "CustomerController:update");
+$route->delete("/customers/{id}", "CustomerController:remove");
 
 $route->get("/sales", "SaleController:index");
 $route->post("/sales", "SaleController:create");

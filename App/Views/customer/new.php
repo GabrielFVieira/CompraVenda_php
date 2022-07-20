@@ -1,23 +1,23 @@
-<div class="modal fade" id="modalNewProvider" tabindex="-1" role="dialog" aria-labelledby="newProviderModalLabel"
+<div class="modal fade" id="modalNewCustomer" tabindex="-1" role="dialog" aria-labelledby="newCustomerModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="newProviderModalLabel">Fornecedor</h5>
+                <h5 class="modal-title" id="newCustomerModalLabel">Cliente</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="providerForm">
+                <form id="customerForm">
                     <input type="hidden" id="id" name="id">
                     <div class="form-group">
-                        <label for="corporateName">Razao Social:</label>
-                        <input type="text" class="form-control" id="corporateName" name="corporateName" maxlength="50">
+                        <label for="name">Nome:</label>
+                        <input type="text" class="form-control" id="name" name="name" maxlength="50">
                     </div>
                     <div class="form-group">
-                        <label for="cnpj">CNPJ:</label>
-                        <input type="text" class="form-control" id="cnpj" name="cnpj" maxlength="18">
+                        <label for="cpf">CPF:</label>
+                        <input type="text" class="form-control" id="cpf" name="cpf" maxlength="18">
                     </div>
                     <div class="form-group">
                         <label for="address">Endereço:</label>
@@ -66,21 +66,21 @@
 
 <script>
 $(document).ready(function() {
-    const validator = $('#providerForm').validate({
+    const validator = $('#customerForm').validate({
         errorPlacement: function(label, element) {
             label.addClass('error-msg text-danger');
             label.insertAfter(element);
         },
         wrapper: 'span',
         rules: {
-            corporateName: {
+            name: {
                 required: true,
                 maxlength: 50,
             },
-            cnpj: {
+            cpf: {
                 required: true,
-                cnpjBR: true,
-                maxlength: 18
+                cpfBR: true,
+                maxlength: 14
             },
             address: {
                 required: true,
@@ -101,7 +101,7 @@ $(document).ready(function() {
             cep: {
                 required: true,
                 postalcodeBR: true,
-                maxlength: 9
+                maxlength: 8
             },
             phone: {
                 required: true,
@@ -115,8 +115,8 @@ $(document).ready(function() {
         }
     });
 
-    $('#cnpj').mask('00.000.000/0000-00');
-    $('#cep').mask('00000-000');
+    $('#cpf').mask('000.000.000-00');
+    $('#cep').mask('00000000');
     $('#phone').mask('(00)0#');
 });
 </script>
