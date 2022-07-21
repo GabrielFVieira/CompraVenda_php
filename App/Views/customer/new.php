@@ -17,7 +17,7 @@
                     </div>
                     <div class="form-group">
                         <label for="cpf">CPF:</label>
-                        <input type="text" class="form-control" id="cpf" name="cpf" maxlength="18">
+                        <input type="text" class="form-control" id="cpf" name="cpf" maxlength="14">
                     </div>
                     <div class="form-group">
                         <label for="address">Endereço:</label>

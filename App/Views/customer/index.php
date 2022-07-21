@@ -1,10 +1,13 @@
 <?php
+
+use App\models\Role;
+
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div class="vh-100 p-4 d-flex flex-column">
         <?php
-            if ($_SESSION['papelUsuario'] == "Vendedor") {
+            if ($_SESSION['papelUsuario'] == Role::toString(Role::Vendedor)) {
             ?>
         <button id="btnNew" class="btn text-white" style="border-radius: 14px; background-color: #000;">
             Novo cliente
@@ -50,7 +53,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                         <td><?= $customer->getEmail() ?></td>
                         <td>
                             <?php
-                                        if ($_SESSION['papelUsuario'] == "Vendedor") {
+                                        if ($_SESSION['papelUsuario'] == Role::toString(Role::Vendedor)) {
                                         ?>
                             <button type="button" id="btnEdit" data-id="<?= $customer->getId() ?>"
                                 class="btn btn-outline-primary">Editar</button>
