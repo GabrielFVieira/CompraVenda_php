@@ -56,6 +56,12 @@ $route->get("/providers/{id}", "ProviderController:find");
 $route->put("/providers/{id}", "ProviderController:update");
 $route->delete("/providers/{id}", "ProviderController:remove");
 
+$route->get("/employees", "EmployeeController:index");
+$route->post("/employees", "EmployeeController:create");
+$route->get("/employees/{id}", "EmployeeController:find");
+$route->put("/employees/{id}", "EmployeeController:update");
+$route->delete("/employees/{id}", "EmployeeController:remove");
+
 /**
  * ERROR
  */

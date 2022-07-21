@@ -30,6 +30,10 @@ class DashboardController extends BaseController
                 $data = $this->getBuyerData();
                 $this->view('dashboard/buyer', $data);
                 break;
+            case Role::Administrador:
+                $data = $this->getAdminData();
+                $this->view('dashboard/admin', $data);
+                break;
             default:
                 Utils::redirect("logout");
                 break;
@@ -64,6 +68,13 @@ class DashboardController extends BaseController
             'customers' => $customers,
             'products' => $products
         ];
+
+        return $data;
+    }
+
+    private function getAdminData()
+    {
+        $data = [];
 
         return $data;
     }

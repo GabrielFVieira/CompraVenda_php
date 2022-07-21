@@ -2,6 +2,7 @@
 
 namespace app\utils;
 
+use App\models\Employee;
 use GUMP as Validador;
 use App\models\Role;
 
@@ -69,7 +70,7 @@ class Utils
         endif;
     }
 
-    public static function hasPermission(int $role)
+    public static function hasPermission(string $role)
     {
         if (Role::fromString($_SESSION['papelUsuario']) == $role) :
             return true;
@@ -80,5 +81,14 @@ class Utils
         Utils::jsonResponse(403, $data);
 
         return false;
+    }
+
+    public static function omitPasswords(Employee ...$employees)
+    {
+        foreach ($employees as $employee) {
+            $employee->setSenha(null);
+        }
+
+        return $employees;
     }
 }

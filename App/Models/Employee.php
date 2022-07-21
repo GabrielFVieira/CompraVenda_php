@@ -2,7 +2,9 @@
 
 namespace App\models;
 
-class Employee
+use App\Controllers\EmployeeController;
+
+class Employee implements \JsonSerializable
 {
     private $id, $nome, $cpf, $senha, $papel;
 
@@ -57,6 +59,11 @@ class Employee
         $this->senha = $senha;
     }
 
+    public function isSenhaDefault()
+    {
+        return EmployeeController::DefaultPassword == $this->senha;
+    }
+
     /******************* */
     public function getPapel()
     {
@@ -71,5 +78,10 @@ class Employee
     public function getPapelString()
     {
         return Role::toString($this->papel);
+    }
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }
