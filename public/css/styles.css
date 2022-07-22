@@ -1,6 +1,7 @@
 html,
 body {
-	overflow: auto;
+	width: 100%;
+	height: 100%;
 }
 
 .error-msg {
@@ -25,4 +26,33 @@ body {
 }
 .table-wrapper-scroll-y {
 	display: block;
+}
+
+.nav .nav-item .active {
+	background-color: #000;
+}
+
+.reportDiv {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+}
+
+.reportDiv > div {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 78%;
+}
+
+.reportDiv > div > .reportTableDiv.active {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	overflow: auto;
+}
+
+.reportDiv > div > .reportTableDiv #inventoryTable_filter {
+	margin-left: -10px;
 }

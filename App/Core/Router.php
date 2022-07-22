@@ -62,6 +62,8 @@ $route->get("/employees/{id}", "EmployeeController:find");
 $route->put("/employees/{id}", "EmployeeController:update");
 $route->delete("/employees/{id}", "EmployeeController:remove");
 
+$route->get("/report/products", "ReportController:products");
+
 /**
  * ERROR
  */

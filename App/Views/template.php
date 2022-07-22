@@ -6,6 +6,7 @@
     <meta name="viewport">
     <link rel="shortcut icon" href="#">
     <link href="<?= URL_CSS ?>bootstrap.min.css" rel="stylesheet">
+    <link href="<?= URL_JS ?>dataTables/datatables.min.css" rel="stylesheet">
     <link href="<?= URL_CSS ?>sidebar.css" rel="stylesheet">
     <link href="<?= URL_CSS ?>styles.css" rel="stylesheet">
     <link href="<?= URL_JS ?>sweetalert2/sweetalert2.css" rel="stylesheet">
@@ -13,9 +14,9 @@
     <title>App CompraVenda</title>
 </head>
 
-<body>
+<body>    
     <?php require_once 'App/Views/' . $view . '.php' ?>
-
+    
     <script src="<?= URL_JS ?>bootstrap.min.js"></script>
     <script src="<?= URL_JS ?>sweetalert2/sweetalert2.js"></script>
 </body>

@@ -1,11 +1,13 @@
 <?php
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
+<script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
+
 <div class="d-flex">
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div class="container-fluid p-4 mr-5">
-        <div class="row m-0 w-100 h-100 gx-5">
-            <div class="col-7 px-5 d-flex flex-column">
+        <div class="row m-0 w-100 h-100">
+            <div class="col-sm-7 px-5 d-flex flex-column" style="min-width: 450px;">
                 <div class="w-100 d-flex px-5"
                     style="height: 25%; min-height:200px; border-radius: 14px; background-color: #F5F5F7;">
                     <div class="h-100 py-5 d-flex flex-column justify-content-center text-left">
@@ -21,7 +23,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                         <div class="col-6 py-4">
                             <button id="btnNewEmployee" class="btn btn-block text-white h-100"
                                 style="border-radius: 14px; background-color: #000;">
-                                <h2 class="font-weight-bold">Nova Compra</h2>
+                                <h2 class="font-weight-bold">Novo Funcionário</h2>
                                 </abutton>
                         </div>
                         <div class="col-3 py-4">
@@ -40,11 +42,13 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                         </div>
                     </div>
                 </div>
-                <div class="w-100 text-left flex-grow-1"
+                <div class="w-100 text-left flex-grow-1 p-4"
                     style="height: 190px; border-radius: 14px; background-color: #F5F5F7;">
+                    <?php include 'App/Views/dashboard/productReport.php' ?>
                 </div>
             </div>
-            <div class="col-5 pl-5 d-flex flex-column">
+            <div class="w-100 d-md-block d-lg-none" style="height: 1px"></div>
+            <div class="col-sm-5 pl-5 d-flex flex-column">
                 <div style="height: 100%; border-radius: 14px; background-color: #F5F5F7;">
                 </div>
             </div>
@@ -52,7 +56,6 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
     </div>
 </div>
 
-<script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
 <script src="<?= URL_JS ?>defaultScripts.js"></script>
 <?php include 'App/Views/employee/new.php' ?>
 

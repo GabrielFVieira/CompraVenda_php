@@ -91,4 +91,16 @@ class Utils
 
         return $employees;
     }
+
+    public static function getQueryParams()
+    {
+        $url = "http://localhost{$_SERVER['REQUEST_URI']}";
+        $url_components = parse_url($url);
+        $params = [];
+        if (isset($url_components['query'])) :
+            parse_str($url_components['query'], $params);
+        endif;
+
+        return $params;
+    }
 }
