@@ -101,6 +101,38 @@ class ProductModel extends BaseModel
         }
     }
 
+    public function listEnabledForSaleWithAvailableAmount()
+    {
+        try {
+            $sql = "SELECT p.*, c.nome_categoria as nome_categoria FROM produtos p
+                        INNER JOIN categorias c
+                        ON c.id = p.id_categoria
+                        WHERE p.liberado_venda = 'S'
+                        AND p.quantidade_disponível > 0
+                        ORDER BY p.nome_produto";
+            $conn = ProductModel::getConexao();
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) :
+                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, ProductModel::ModelFromDBArray($value));
+                }
+
+                return $result;
+            else :
+                return;
+            endif;
+        } catch (\PDOException $e) {
+            error_log('Erro ao listar produtos: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function list()
     {
         try {

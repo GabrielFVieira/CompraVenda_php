@@ -11,16 +11,26 @@ class DashboardController extends BaseController
     function __construct()
     {
         session_start();
-        if (!Utils::usuarioLogado()) :
-            Utils::redirect("login");
-            exit();
-        endif;
+        // if (!Utils::usuarioLogado()) :
+        //     Utils::redirect("login");
+        //     exit();
+        // endif;
     }
 
     public function index()
     {
-        $papel = Role::fromString($_SESSION['papelUsuario']);
+        if (!Utils::usuarioLogado()) :
+            $productModel = $this->model('ProductModel');
+            $products = $productModel->listEnabledForSaleWithAvailableAmount();
+            $data = [
+                'products' => $products
+            ];
 
+            $this->view('dashboard/customer', $data);
+            exit();
+        endif;
+
+        $papel = Role::fromString($_SESSION['papelUsuario']);
         switch ($papel) {
             case Role::Vendedor:
                 $data = $this->getSellerData();

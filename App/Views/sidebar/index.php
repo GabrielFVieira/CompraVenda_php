@@ -1,4 +1,4 @@
-<div id="sidebar" class="vh-100 py-4 pl-4">
+<div id="layoutSidenav_nav" class="vh-100 py-4 pl-4">
     <div id="sidebarContent" class="h-100 w-100 sidebar">
         <ul class="nav-list">
             <li>

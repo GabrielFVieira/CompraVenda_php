@@ -60,3 +60,26 @@ body {
 .reportDiv .botton .reportTableDiv #inventoryTable_filter {
 	margin-left: -10px;
 }
+
+#layoutSidenav {
+	display: flex;
+	min-width: 600px;
+}
+
+#layoutSidenav #layoutSidenav_nav {
+	flex-basis: 100px;
+	flex-shrink: 0;
+	position: -webkit-sticky; /* Safari & IE */
+	position: sticky;
+	top: 0rem;
+}
+
+#layoutSidenav #layoutSidenav_content {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-width: 0;
+	flex-grow: 1;
+	min-height: 100vh;
+}

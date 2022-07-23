@@ -86,20 +86,12 @@ $(document).ready(function() {
             });
 
             $('#salesTable').DataTable({
-                responsive: true,
-                scrollX: false,
-                scrollY: false,
-                paging: false,
-                info: false
+                responsive: true
             });
             $('.dataTables_length').addClass('bs-select');
 
             buildChart(parsedData);
         }
-    });
-
-    $('.salesBtn').on('shown.bs.tab', function(e) {
-        $('#salesTable').DataTable().columns.adjust();
     });
 });
 </script>

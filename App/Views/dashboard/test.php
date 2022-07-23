@@ -21,26 +21,26 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                             <img src="<?= URL_IMG ?>char.svg" style="max-width:100%; max-height:100%;" />
                         </div>
                     </div>
-                    <div class="container-fluid my-4" style="min-height: 80px">
+                    <div class="container-fluid my-4" style="min-height: 60px">
                         <div class="row h-100" >
-                            <div class="col-6 pl-0">
+                            <div class="col-6">
                                 <button id="btnNewEmployee" class="btn btn-block text-white h-100"
                                     style="border-radius: 14px; background-color: #000;">
-                                    <h2 class="m-0 font-weight-bold">Novo Funcionário</h2>
+                                    <p class="m-0 font-weight-bold">Novo Funcionário</h2>
                                     </abutton>
                             </div>
                             <div class="col-3">
                                 <a href="<?= BASE_URL ?>/employees"
                                     class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
                                     role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
-                                    <h4 class="m-0">Equipe</h4>
+                                    <p class="m-0 font-weight-bold">Equipe</p>
                                 </a>
                             </div>
-                            <div class="col-3 pr-0">
+                            <div class="col-3">
                                 <a href="<?= BASE_URL ?>/products"
                                     class="btn btn-block text-white d-flex justify-content-center align-items-center h-100"
                                     role="button" aria-pressed="true" style="border-radius: 14px; background-color: #000;">
-                                    <h4 class="m-0">Produtos</h4>
+                                    <p class="m-0 font-weight-bold">Produtos</p>
                                 </a>
                             </div>
                         </div>

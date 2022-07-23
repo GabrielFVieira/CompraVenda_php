@@ -35,45 +35,31 @@ class AccessController extends BaseController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] == "POST") :
-            $validacao = new Validador("pt-br");
+            if (Utils::validateInputs($_POST, $this->filters, $this->rules) == false) {
+                exit();
+            }
 
-            $post_filtrado = $validacao->filter($_POST, $this->filters);
-            $post_validado = $validacao->validate($post_filtrado, $this->rules);
+            $senha_enviada = $_POST['password'];
+            $model = $this->model('EmployeeModel');
+            $usuario = $model->getEmployeeByCPF($_POST['cpf']);
 
-            if ($post_validado === true) :
-                $senha_enviada = $_POST['password'];
-                $model = $this->model('EmployeeModel');
-                $usuario = $model->getEmployeeByCPF($_POST['cpf']);
+            if (!empty($usuario) && $senha_enviada == $usuario->getSenha()) :
+                session_regenerate_id(true);
 
-                if (!empty($usuario) && $senha_enviada == $usuario->getSenha()) :
-                    session_regenerate_id(true);
+                $_SESSION['id'] = $usuario->getId();
+                $_SESSION['nomeUsuario'] = $usuario->getNome();
+                $_SESSION['cpfUsuario'] = $usuario->getCPF();
+                $_SESSION['papelUsuario'] = $usuario->getPapelString();
 
-                    $_SESSION['id'] = $usuario->getId();
-                    $_SESSION['nomeUsuario'] = $usuario->getNome();
-                    $_SESSION['cpfUsuario'] = $usuario->getCPF();
-                    $_SESSION['papelUsuario'] = $usuario->getPapelString();
+                Utils::jsonResponse(200);
 
-                    Utils::redirect(); // redirect to dashboard
-
-                else :
-                    $mensagem = ["Usuário e/ou Senha incorreta"];
-                    $data = [
-                        'mensagens' => $mensagem
-                    ];
-
-                    $this->view('login/index', $data);
-                endif;
             else :
-                $mensagem = $validacao->get_errors_array();
-                $data = [
-                    'mensagens' => $mensagem
-                ];
-                $_SESSION['token'] = Utils::gerarTokenCSRF();
-
-                $this->view('login/index', $data);
+                $mensagem = ["Usuário e/ou Senha incorreta"];
+                $data = ['errors' => $mensagem];
+                Utils::jsonResponse(401, $data);
             endif;
         else :
-            Utils::redirect();  // redirect to dashboard
+            Utils::redirect();
         endif;
     }
 

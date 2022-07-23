@@ -89,22 +89,34 @@ $(document).ready(function() {
                 table.append("<tr><td>" + elem.nome + "</td><td>" + elem
                     .quantidadeDisponivel + "</td></tr>");
             });
+            $.each(parsedData, function(idx, elem) {
+                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
+                    .quantidadeDisponivel + "</td></tr>");
+            });
+            $.each(parsedData, function(idx, elem) {
+                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
+                    .quantidadeDisponivel + "</td></tr>");
+            });
+            $.each(parsedData, function(idx, elem) {
+                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
+                    .quantidadeDisponivel + "</td></tr>");
+            });
+            $.each(parsedData, function(idx, elem) {
+                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
+                    .quantidadeDisponivel + "</td></tr>");
+            });
+            $.each(parsedData, function(idx, elem) {
+                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
+                    .quantidadeDisponivel + "</td></tr>");
+            });
 
             $('#inventoryTable').DataTable({
-                responsive: true,
-                scrollX: false,
-                scrollY: false,
-                paging: false,
-                info: false
+                responsive: true
             });
             $('.dataTables_length').addClass('bs-select');
 
             buildChart(parsedData);
         }
-    });
-
-    $('.inventoryBtn').on('shown.bs.tab', function(e) {
-        $('#inventoryTable').DataTable().columns.adjust();
     });
 });
 </script>
