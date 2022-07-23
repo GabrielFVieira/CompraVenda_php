@@ -63,7 +63,7 @@ $(document).ready(function() {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'right',
+                        position: 'bottom',
                         labels: {
                             font: {
                                 size: 18,

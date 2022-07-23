@@ -79,7 +79,8 @@ $(document).ready(function() {
 
             const table = $("#salesTable tbody");
             $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.data + "</td><td>" + Math.round(elem.total *
+                table.append("<tr><td>" + elem.data + "</td><td>R$" + Math.round(elem
+                        .total *
                         100) / 100 +
                     "</td></tr>");
             });
@@ -89,8 +90,7 @@ $(document).ready(function() {
                 scrollX: false,
                 scrollY: false,
                 paging: false,
-                info: false,
-                searching: false
+                info: false
             });
             $('.dataTables_length').addClass('bs-select');
 
