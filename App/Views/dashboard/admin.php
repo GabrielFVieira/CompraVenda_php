@@ -2,8 +2,10 @@
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
 
 <script src="<?= URL_JS ?>jquery-3.6.0.min.js"></script>
+<script src="<?= URL_JS ?>dataTables/datatables.min.js"></script>
+<script src="<?= URL_JS ?>chart.min.js"></script>
 
-<div class="d-flex">
+<div class="d-flex h-100">
     <?php require_once 'App/Views/sidebar/index.php' ?>
     <div class="container-fluid p-4 mr-5">
         <div class="row m-0 w-100 h-100">
@@ -44,12 +46,12 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                 </div>
                 <div class="w-100 text-left flex-grow-1 p-4"
                     style="height: 190px; border-radius: 14px; background-color: #F5F5F7;">
-                    <?php include 'App/Views/dashboard/productReport.php' ?>
+                    <?php include 'App/Views/dashboard/salesReport.php' ?>
                 </div>
             </div>
-            <div class="w-100 d-md-block d-lg-none" style="height: 1px"></div>
-            <div class="col-sm-5 pl-5 d-flex flex-column">
-                <div style="height: 100%; border-radius: 14px; background-color: #F5F5F7;">
+            <div class="col-sm-5 pl-5 d-flex flex-column h-100" style="min-width: 450px;">
+                <div class="p-4" style="height: 100%; border-radius: 14px; background-color: #F5F5F7;">
+                    <?php include 'App/Views/dashboard/productReport.php' ?>
                 </div>
             </div>
         </div>
@@ -65,7 +67,6 @@ $(document).ready(function() {
         $("#id").val(data.id);
         $("#name").val(data.nome);
         $("#cpf").val(data.cpf);
-        $("#password").val(data.senha);
         $("#role").val(data.papel);
     }
 
@@ -73,7 +74,6 @@ $(document).ready(function() {
         $("#id").val("");
         $("#name").val("");
         $("#cpf").val("");
-        $("#password").val("");
         $("#role").val("");
     }
 
@@ -86,7 +86,8 @@ $(document).ready(function() {
         btnDeleteId: "#btnDelete",
         modelId: "#modalNewEmployee",
         setupFieldValues: setupFieldValues,
-        emptyFields: emptyFields
+        emptyFields: emptyFields,
+        redirectTo: "<?= BASE_URL . '/employees' ?>"
     }
 
     setupDocument(options);

@@ -58,9 +58,6 @@ class SaleController extends BaseController
         $model->setProductId($data['product']);
         $model->setClientId($data['customer']);
         $model->setAmount($data['amount']);
-
-        // $value = str_replace(',', '.', $data['value']);
-        // $model->setValue(floatval($value));
     }
 
     private function validateSale(Sale &$sale, Product $product)
@@ -72,6 +69,12 @@ class SaleController extends BaseController
             return false;
         elseif ($product->getQuantidadeDisponivel() <= 0) :
             $errors = ['Produto sem estoque'];
+            $data = ['errors' => $errors];
+            Utils::jsonResponse(400, $data);
+            return false;
+        elseif ($product->getQuantidadeDisponivel() < $sale->getAmount()) :
+            $errors = ['O produto selecionado só possui ' .
+                $product->getQuantidadeDisponivel() . ' unidades em estoque'];
             $data = ['errors' => $errors];
             Utils::jsonResponse(400, $data);
             return false;

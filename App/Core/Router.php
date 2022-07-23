@@ -63,6 +63,7 @@ $route->put("/employees/{id}", "EmployeeController:update");
 $route->delete("/employees/{id}", "EmployeeController:remove");
 
 $route->get("/report/products", "ReportController:products");
+$route->get("/report/sales", "ReportController:sales");
 
 /**
  * ERROR

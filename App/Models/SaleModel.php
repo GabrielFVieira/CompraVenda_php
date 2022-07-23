@@ -139,6 +139,33 @@ class SaleModel extends BaseModel
         }
     }
 
+    public function listSalesByMonth()
+    {
+        try {
+            $sql = "SELECT DATE_FORMAT(data_venda, '%M/%Y') as data, 
+                    sum(valor_venda) as total 
+                    FROM `vendas`
+                    GROUP BY data
+                    ORDER BY data_venda ASC";
+            $conn = SaleModel::getConexao();
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) :
+                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                return $resultset;
+
+            else :
+                return;
+            endif;
+        } catch (\PDOException $e) {
+            error_log('Erro ao listar vendas por mês: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function remove(int $id)
     {
         try {

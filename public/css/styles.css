@@ -1,7 +1,7 @@
 html,
 body {
-	width: 100%;
-	height: 100%;
+	width: 100vw;
+	height: 100vh;
 }
 
 .error-msg {
@@ -39,20 +39,24 @@ body {
 	height: 100%;
 }
 
-.reportDiv > div {
+.reportDiv .top {
+	height: 105px;
+}
+
+.reportDiv .botton {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-	height: 78%;
+	height: calc(100% - 105px);
 }
 
-.reportDiv > div > .reportTableDiv.active {
+.reportDiv .botton .reportTableDiv.active {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
 	overflow: auto;
 }
 
-.reportDiv > div > .reportTableDiv #inventoryTable_filter {
+.reportDiv .botton .reportTableDiv #inventoryTable_filter {
 	margin-left: -10px;
 }
