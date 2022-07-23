@@ -21,7 +21,7 @@
                 <table id="salesTable" class="table table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th scope="col">Mês/Ano</th>
+                            <th scope="col">Data</th>
                             <th scope="col">Total</th>
                         </tr>
                     </thead>

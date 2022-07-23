@@ -139,10 +139,10 @@ class SaleModel extends BaseModel
         }
     }
 
-    public function listSalesByMonth()
+    public function listSalesByDay()
     {
         try {
-            $sql = "SELECT DATE_FORMAT(data_venda, '%M/%Y') as data, 
+            $sql = "SELECT DATE_FORMAT(data_venda, '%d/%m/%Y') as data, 
                     sum(valor_venda * quantidade_venda) as total 
                     FROM `vendas`
                     GROUP BY data
@@ -161,7 +161,7 @@ class SaleModel extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            error_log('Erro ao listar vendas por mês: ' . $e->getMessage());
+            error_log('Erro ao listar vendas por dia: ' . $e->getMessage());
             throw $e;
         }
     }

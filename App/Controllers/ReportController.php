@@ -29,7 +29,7 @@ class ReportController extends BaseController
     public function sales()
     {
         $saleModel = $this->model('SaleModel');
-        $sales = $saleModel->listSalesByMonth();
+        $sales = $saleModel->listSalesByDay();
         Utils::jsonResponse(200, $sales);
     }
 }
