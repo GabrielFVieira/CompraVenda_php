@@ -76,8 +76,7 @@ class ProductModel extends BaseModel
             $sql = "SELECT p.*, c.nome_categoria as nome_categoria FROM produtos p
                         INNER JOIN categorias c
                         ON c.id = p.id_categoria
-                        WHERE p.quantidade_disponível > 0 
-                        AND p.liberado_venda = 'S'
+                        WHERE p.liberado_venda = 'S'
                         ORDER BY p.nome_produto";
             $conn = ProductModel::getConexao();
 

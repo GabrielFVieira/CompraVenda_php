@@ -143,7 +143,7 @@ class SaleModel extends BaseModel
     {
         try {
             $sql = "SELECT DATE_FORMAT(data_venda, '%M/%Y') as data, 
-                    sum(valor_venda) as total 
+                    sum(valor_venda * quantidade_venda) as total 
                     FROM `vendas`
                     GROUP BY data
                     ORDER BY data_venda ASC";

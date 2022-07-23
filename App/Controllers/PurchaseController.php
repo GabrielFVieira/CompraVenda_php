@@ -148,6 +148,12 @@ class PurchaseController extends BaseController
                 exit();
             endif;
 
+
+            $oldProductId = $oldPurchase->getIdProduto();
+            $oldPurchaseAmount = $oldPurchase->getQuantidade();
+
+            $this->updateModelValues($oldPurchase, $_PUT);
+
             $productModel = $this->model('ProductModel');
             $product = $productModel->get($oldPurchase->getIdProduto());
 
@@ -158,18 +164,23 @@ class PurchaseController extends BaseController
                 exit();
             endif;
 
-            $qtd = $_PUT['amount'];
-            $qtdDiff = $qtd - $oldPurchase->getQuantidade();
-
-            $this->updateModelValues($oldPurchase, $_PUT);
+            if ($oldProductId == $product->getId()) :
+                $qtdDiff = $oldPurchase->getQuantidade() - $oldPurchaseAmount;
+                $newQtd = $product->getQuantidadeDisponivel() + $qtdDiff;
+            else :
+                $newQtd = $product->getQuantidadeDisponivel() + $oldPurchase->getQuantidade();
+            endif;
 
             try {
                 $purchaseModel->update($oldPurchase);
 
-                $newQtd = $product->getQuantidadeDisponivel() + $qtdDiff;
-                $product->setQuantidadeDisponivel($newQtd);
-                $product->setPrecoCompra($oldPurchase->getValor());
+                if ($oldProductId != $product->getId()) :
+                    $oldProduct = $productModel->get($oldProductId);
+                    $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() - $oldPurchaseAmount);
+                    $productModel->update($oldProduct);
+                endif;
 
+                $product->setQuantidadeDisponivel($newQtd);
                 $productModel->update($product);
 
                 Utils::jsonResponse();
@@ -230,8 +241,13 @@ class PurchaseController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
 
-
                 $purchaseModel->remove($id);
+
+                $productModel = $this->model('ProductModel');
+                $product = $productModel->get($purchase->getIdProduto());
+                $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() - $purchase->getQuantidade());
+                $productModel->update($product);
+
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover compra'];

@@ -67,17 +67,6 @@ class SaleController extends BaseController
             $data = ['errors' => $errors];
             Utils::jsonResponse(404, $data);
             return false;
-        elseif ($product->getQuantidadeDisponivel() <= 0) :
-            $errors = ['Produto sem estoque'];
-            $data = ['errors' => $errors];
-            Utils::jsonResponse(400, $data);
-            return false;
-        elseif ($product->getQuantidadeDisponivel() < $sale->getAmount()) :
-            $errors = ['O produto selecionado só possui ' .
-                $product->getQuantidadeDisponivel() . ' unidades em estoque'];
-            $data = ['errors' => $errors];
-            Utils::jsonResponse(400, $data);
-            return false;
         elseif ($product->isLiberadoVenda() == false) :
             $errors = ['Produto não liberado para venda'];
             $data = ['errors' => $errors];
@@ -117,6 +106,14 @@ class SaleController extends BaseController
             $product = $productModel->get($sale->getProductId());
 
             if ($this->validateSale($sale, $product) == false) :
+                exit();
+            endif;
+
+            if ($product->getQuantidadeDisponivel() < $sale->getAmount()) :
+                $errors = ['O produto selecionado só possui ' .
+                    $product->getQuantidadeDisponivel() . ' unidades em estoque'];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(400, $data);
                 exit();
             endif;
 
@@ -181,28 +178,41 @@ class SaleController extends BaseController
             endif;
 
             $oldProductId = $oldSale->getProductId();
-            $qtd = $_PUT['amount'];
-            $qtdDiff = $qtd - $oldSale->getAmount();
+            $oldSaleAmount = $oldSale->getAmount();
 
             $this->updateModelValues($oldSale, $_PUT);
 
             $productModel = $this->model('ProductModel');
             $product = $productModel->get($oldSale->getProductId());
 
-            if ($oldProductId != $oldSale->getProductId()) :
-                $oldSale->setValue($product->getPrecoVenda());
+            if ($this->validateSale($oldSale, $product) == false) :
+                exit();
             endif;
 
-            if ($this->validateSale($oldSale, $product) == false) :
+            if ($oldProductId == $product->getId()) :
+                $qtdDiff = $oldSale->getAmount() - $oldSaleAmount;
+                $newQtd = $product->getQuantidadeDisponivel() - $qtdDiff;
+            else :
+                $newQtd = $product->getQuantidadeDisponivel() - $oldSale->getAmount();
+            endif;
+
+            if ($newQtd < 0) :
+                $errors = [$product->getQuantidadeDisponivel() <= 0 ? ('Produto sem estoque') : ('O produto selecionado só possui ' . $product->getQuantidadeDisponivel() . ' unidades em estoque')];
+                $data = ['errors' => $errors];
+                Utils::jsonResponse(400, $data);
                 exit();
             endif;
 
             try {
                 $saleModel->update($oldSale);
 
-                $newQtd = $product->getQuantidadeDisponivel() - $qtdDiff;
-                $product->setQuantidadeDisponivel($newQtd);
+                if ($oldProductId != $product->getId()) :
+                    $oldProduct = $productModel->get($oldProductId);
+                    $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() + $oldSaleAmount);
+                    $productModel->update($oldProduct);
+                endif;
 
+                $product->setQuantidadeDisponivel($newQtd);
                 $productModel->update($product);
 
                 Utils::jsonResponse();
@@ -264,6 +274,12 @@ class SaleController extends BaseController
                 endif;
 
                 $saleModel->remove($id);
+
+                $productModel = $this->model('ProductModel');
+                $product = $productModel->get($sale->getProductId());
+                $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() + $sale->getAmount());
+                $productModel->update($product);
+
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover venda'];
