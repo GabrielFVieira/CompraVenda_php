@@ -1,7 +1,7 @@
 <section class="vh-100" style="background-color: #000;">
     <div class="container d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div class="card" style="border-radius: 1rem;">
+            <div class="card" style="border-radius: 1rem; min-width: 240px;">
                 <form id="formLogin" class="login-form">
                     <input type="hidden" name="token" value="<?= $_SESSION['token'] ?>" />
                     <div class="card-body p-5">

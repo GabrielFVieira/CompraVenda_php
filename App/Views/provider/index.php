@@ -3,9 +3,9 @@
 use App\models\Role;
 
 if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
-    <div id="layoutSidenav">
+    <div id="pageBody">
         <?php require_once 'App/Views/sidebar/index.php' ?>
-        <div id="layoutSidenav_content" class="px-4">
+        <div id="pageBody_content" class="px-4">
             <div class="w-95 h-100 my-4 p-4" style="border-radius: 14px; background-color: #F5F5F7;">
                 <h3 class="text-center mb-4">Listagem de Fornecedores</h3>
                 <?php
