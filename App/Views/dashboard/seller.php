@@ -34,7 +34,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                                     <table id="salesTable" class="table table-hover table-bordered">
                                         <thead>
                                             <tr>
-                                                <th scope="col">Nome</th>
+                                                <th scope="col">Produto</th>
                                                 <th scope="col">Data</th>
                                                 <th scope="col">Quantidade</th>
                                                 <th scope="col">Preço</th>
