@@ -7,7 +7,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
         <?php require_once 'App/Views/sidebar/index.php' ?>
         <div id="pageBody_content" class="px-4">
             <div class="w-95 h-100 my-4 p-4" style="border-radius: 14px; background-color: #F5F5F7;">
-                <h3 class="text-center mb-4">Listagem de Fornecedores</h3>
+                <h3 class="text-center mb-4">Listagem de Funcionários</h3>
                 <?php
                 if ($_SESSION['papelUsuario'] == Role::toString(Role::Administrador)) {
                 ?>
