@@ -89,26 +89,6 @@ $(document).ready(function() {
                 table.append("<tr><td>" + elem.nome + "</td><td>" + elem
                     .quantidadeDisponivel + "</td></tr>");
             });
-            $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
-                    .quantidadeDisponivel + "</td></tr>");
-            });
-            $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
-                    .quantidadeDisponivel + "</td></tr>");
-            });
-            $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
-                    .quantidadeDisponivel + "</td></tr>");
-            });
-            $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
-                    .quantidadeDisponivel + "</td></tr>");
-            });
-            $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.nome + "</td><td>" + elem
-                    .quantidadeDisponivel + "</td></tr>");
-            });
 
             $('#inventoryTable').DataTable({
                 responsive: true
