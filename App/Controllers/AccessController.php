@@ -39,25 +39,14 @@ class AccessController extends BaseController
                 exit();
             }
 
-            $senha_enviada = $_POST['password'];
-            $model = $this->service('EmployeeService');
-            $usuario = $model->getEmployeeByCPF($_POST['cpf']);
-
-            if (!empty($usuario) && $senha_enviada == $usuario->getSenha()) :
-                session_regenerate_id(true);
-
-                $_SESSION['id'] = $usuario->getId();
-                $_SESSION['nomeUsuario'] = $usuario->getNome();
-                $_SESSION['cpfUsuario'] = $usuario->getCPF();
-                $_SESSION['papelUsuario'] = $usuario->getPapelString();
+            try {
+                $accessService = $this->service('AccessService');
+                $accessService->login($_POST['cpf'], $_POST['password']);
 
                 Utils::jsonResponse(200);
-
-            else :
-                $mensagem = ["Usuário e/ou Senha incorreta"];
-                $data = ['errors' => $mensagem];
-                Utils::jsonResponse(401, $data);
-            endif;
+            } catch (\Exception $e) {
+                Utils::returnJsonError(401, $e->getMessage());
+            }
         else :
             Utils::redirect();
         endif;
@@ -65,8 +54,13 @@ class AccessController extends BaseController
 
     public function logout()
     {
-        session_unset();
-        session_destroy();
-        Utils::redirect("login");
+        try {
+            $accessService = $this->service('AccessService');
+            $accessService->logout();
+
+            Utils::redirect("login");
+        } catch (\Exception $e) {
+            Utils::returnJsonError(500, $e->getMessage());
+        }
     }
 }

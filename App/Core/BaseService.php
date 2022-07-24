@@ -13,4 +13,14 @@ class BaseService
             echo "Repository not found";
         endif;
     }
+
+    public function service($model)
+    {
+        if (file_exists('App/Service/' . $model . '.php')) :
+            require_once 'App/Service/' . $model . '.php';
+            return new $model;
+        else :
+            echo "Service not found";
+        endif;
+    }
 }

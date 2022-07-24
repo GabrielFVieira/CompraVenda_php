@@ -55,7 +55,6 @@ class PurchaseController extends BaseController
 
     private function updateModelValues(Purchase &$model, $data)
     {
-        $model->setIdFuncionario($_SESSION['id']);
         $model->setIdProduto($data['product']);
         $model->setIdFornecedor($data['provider']);
         $model->setQuantidade($data['amount']);
@@ -73,54 +72,21 @@ class PurchaseController extends BaseController
                 exit();
             }
 
-            $purchase = new Purchase();
-            $this->updateModelValues($purchase, $_POST);
-            $purchase->setData(date("Y-m-d"));
-
-            $productService = $this->service('ProductService');
-            $product = $productService->get($purchase->getIdProduto());
-
-            if (is_null($product)) :
-                $errors = ['Produto não encontrado'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(404, $data);
-                exit();
-            endif;
-
-
             try {
+                $purchase = new Purchase();
+                $this->updateModelValues($purchase, $_POST);
+
                 $purchaseService = $this->service('PurchaseService');
                 $purchaseService->create($purchase);
 
-                $newQtd = $product->getQuantidadeDisponivel() + $purchase->getQuantidade();
-                $product->setQuantidadeDisponivel($newQtd);
-                $product->setPrecoCompra($purchase->getValor());
-
-                $productService->update($product);
-
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
         endif;
     }
-
-    private function validateEdit(Purchase $purchase)
-    {
-        if ($purchase->getIdFuncionario() != $_SESSION['id']) :
-            $errors = ['Comprador não autorizado a editar essa compra'];
-            $data = ['errors' => $errors];
-            Utils::jsonResponse(403, $data);
-            return false;
-        endif;
-
-        return true;
-    }
-
 
     public function update($path)
     {
@@ -134,60 +100,17 @@ class PurchaseController extends BaseController
                 exit();
             }
 
-            $purchaseService = $this->service('PurchaseService');
-            $oldPurchase = $purchaseService->get($path['id']);
-
-            if (is_null($oldPurchase)) :
-                $errors = ['Compra não encontrada'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
-                exit();
-            endif;
-
-            if ($this->validateEdit($oldPurchase) == false) :
-                exit();
-            endif;
-
-
-            $oldProductId = $oldPurchase->getIdProduto();
-            $oldPurchaseAmount = $oldPurchase->getQuantidade();
-
-            $this->updateModelValues($oldPurchase, $_PUT);
-
-            $productService = $this->service('ProductService');
-            $product = $productService->get($oldPurchase->getIdProduto());
-
-            if (is_null($product)) :
-                $errors = ['Produto não encontrado'];
-                $data = ['erros' => $errors];
-                Utils::jsonResponse(500, $data);
-                exit();
-            endif;
-
-            if ($oldProductId == $product->getId()) :
-                $qtdDiff = $oldPurchase->getQuantidade() - $oldPurchaseAmount;
-                $newQtd = $product->getQuantidadeDisponivel() + $qtdDiff;
-            else :
-                $newQtd = $product->getQuantidadeDisponivel() + $oldPurchase->getQuantidade();
-            endif;
-
             try {
-                $purchaseService->update($oldPurchase);
+                $purchase = new Purchase();
+                $this->updateModelValues($purchase, $_PUT);
+                $purchase->setId($path['id']);
 
-                if ($oldProductId != $product->getId()) :
-                    $oldProduct = $productService->get($oldProductId);
-                    $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() - $oldPurchaseAmount);
-                    $productService->update($oldProduct);
-                endif;
-
-                $product->setQuantidadeDisponivel($newQtd);
-                $productService->update($product);
+                $purchaseService = $this->service('PurchaseService');
+                $purchaseService->update($purchase);
 
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -205,14 +128,10 @@ class PurchaseController extends BaseController
                 if (!is_null($purchase)) :
                     Utils::jsonResponse(200, $purchase);
                 else :
-                    $errors = ['Compra não encontrada'];
-                    $data = ['errors' => $errors];
-                    Utils::jsonResponse(404, $data);
+                    Utils::returnJsonError(404, 'Compra não encontrada');
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao buscar compra'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -229,30 +148,11 @@ class PurchaseController extends BaseController
             try {
                 $id = $data['id'];
                 $purchaseService = $this->service('PurchaseService');
-
-                $purchase = $purchaseService->get($id);
-                if (!is_null($purchase)) :
-                    if ($this->validateEdit($purchase) == false) :
-                        exit();
-                    endif;
-                else :
-                    $errors = ['Compra não encontrada'];
-                    $data = ['errors' => $errors];
-                    Utils::jsonResponse(404, $data);
-                endif;
-
                 $purchaseService->remove($id);
-
-                $productService = $this->service('ProductService');
-                $product = $productService->get($purchase->getIdProduto());
-                $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() - $purchase->getQuantidade());
-                $productService->update($product);
 
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
-                $errors = ['Erro ao remover compra'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();
@@ -267,8 +167,17 @@ class PurchaseController extends BaseController
             exit();
         endif;
 
-        $purchaseService = $this->service('PurchaseService');
-        $purchases = $purchaseService->listByUser($_SESSION['id']);
-        Utils::jsonResponse(200, $purchases);
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') :
+            try {
+                $purchaseService = $this->service('PurchaseService');
+                $purchases = $purchaseService->listByUser($_SESSION['id']);
+
+                Utils::jsonResponse(200, $purchases);
+            } catch (Exception $e) {
+                Utils::returnJsonError(500, $e->getMessage());
+            }
+        else :
+            Utils::redirect();
+        endif;
     }
 }

@@ -1,222 +1,183 @@
 <?php
 
-use App\Core\BaseRepository;
+use App\Core\BaseService;
+use App\models\Product;
 use App\models\Sale;
 
-class SaleService extends BaseRepository
+class SaleService extends BaseService
 {
-    private static function ModelFromDBArray($array)
+    private $repository;
+
+    function __construct()
     {
-        $sale = new Sale();
-        $sale->setId($array["id"]);
-        $sale->setAmount($array["quantidade_venda"]);
-        $sale->setDate($array["data_venda"]);
-        $sale->setValue($array["valor_venda"]);
-        $sale->setClientId($array["id_cliente"]);
-        $sale->setProductId($array["id_produto"]);
-        $sale->setEmployeeId($array["id_funcionario"]);
+        $this->repository = $this->repository('SaleRepository');
+    }
 
-        if (isset($array["nome_cliente"])) {
-            $sale->setClientName($array["nome_cliente"]);
-        }
+    private function validateEdit(Sale $sale)
+    {
+        if ($sale->getEmployeeId() != $_SESSION['id']) :
+            throw new Exception('Vendedor não autorizado a editar essa venda');
+        endif;
+    }
 
-        if (isset($array["nome_produto"])) {
-            $sale->setProductName($array["nome_produto"]);
-        }
+    private function validateSale(Sale &$sale, Product $product)
+    {
+        if (is_null($product)) :
+            throw new Exception('Produto não encontrado');
+        elseif ($product->isLiberadoVenda() == false) :
+            throw new Exception('Produto não liberado para venda');
+        endif;
 
-        if (isset($array["nome_funcionario"])) {
-            $sale->setEmployeeName($array["nome_funcionario"]);
-        }
+        $customerService = $this->service('CustomerService');
+        $customer = $customerService->get($sale->getClientId());
 
-        return $sale;
+        if (is_null($customer)) :
+            throw new Exception('Cliente não encontrado');
+        endif;
     }
 
     public function create(Sale $sale)
     {
-        try {
-            $sql = "INSERT INTO vendas(quantidade_venda,data_venda,valor_venda,
-                    id_cliente,id_produto,id_funcionario) VALUES (?,?,?,?,?,?)";
-            $conn = SaleService::getConexao();
+        $sale->setDate(date("Y-m-d"));
+        $sale->setEmployeeId($_SESSION['id']);
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $sale->getAmount());
-            $stmt->bindValue(2, $sale->getDate());
-            $stmt->bindValue(3, $sale->getValue());
-            $stmt->bindValue(4, $sale->getClientId());
-            $stmt->bindValue(5, $sale->getProductId());
-            $stmt->bindValue(6, $sale->getEmployeeId());
-            $stmt->execute();
-            $conn = null;
+        $productService = $this->service('ProductService');
+        $product = $productService->get($sale->getProductId());
+
+        $this->validateSale($sale, $product);
+
+        if ($product->getQuantidadeDisponivel() < $sale->getAmount()) :
+            $msg = 'O produto selecionado só possui ' .
+                $product->getQuantidadeDisponivel() . ' unidades em estoque';
+
+            throw new Exception($msg);
+        endif;
+
+        $sale->setValue($product->getPrecoVenda());
+
+        try {
+            $this->repository->create($sale);
+
+            $newQtd = $product->getQuantidadeDisponivel() - $sale->getAmount();
+            $product->setQuantidadeDisponivel($newQtd);
+
+            $productService->update($product);
         } catch (PDOException $e) {
             error_log('Erro ao cadastrar venda: ' . $e->getMessage());
-            throw $e;
+            throw new Exception('Erro ao cadastrar venda');
         }
     }
 
     public function update(Sale $sale)
     {
-        try {
-            $sql = "UPDATE vendas SET 
-                    quantidade_venda = ?, data_venda = ?,
-                    valor_venda = ?, id_cliente = ?,
-                    id_produto = ?, id_funcionario = ?
-                    WHERE id = ?";
-            $conn = SaleService::getConexao();
+        $oldSale = $this->get($sale->getId());
+        if (is_null($oldSale)) :
+            throw new Exception('Venda não encontrada');
+        endif;
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $sale->getAmount());
-            $stmt->bindValue(2, $sale->getDate());
-            $stmt->bindValue(3, $sale->getValue());
-            $stmt->bindValue(4, $sale->getClientId());
-            $stmt->bindValue(5, $sale->getProductId());
-            $stmt->bindValue(6, $sale->getEmployeeId());
-            $stmt->bindValue(7, $sale->getId());
-            $stmt->execute();
-            $conn = null;
+        $this->validateEdit($oldSale);
+
+        $sale->setDate($oldSale->getDate());
+        $sale->setEmployeeId($_SESSION['id']);
+        $sale->setValue($oldSale->getValue());
+
+        $oldProductId = $oldSale->getProductId();
+        $oldSaleAmount = $oldSale->getAmount();
+
+        $productService = $this->service('ProductService');
+        $product = $productService->get($sale->getProductId());
+
+        $this->validateSale($sale, $product);
+
+        if ($oldProductId == $product->getId()) :
+            $qtdDiff = $sale->getAmount() - $oldSaleAmount;
+            $newQtd = $product->getQuantidadeDisponivel() - $qtdDiff;
+        else :
+            $newQtd = $product->getQuantidadeDisponivel() - $sale->getAmount();
+        endif;
+
+        if ($newQtd < 0) :
+            $msg = $product->getQuantidadeDisponivel() <= 0 ? ('Produto sem estoque') : ('O produto selecionado só possui ' . $product->getQuantidadeDisponivel() . ' unidades em estoque');
+            throw new Exception($msg);
+        endif;
+
+        try {
+            $this->repository->update($sale);
+
+            if ($oldProductId != $product->getId()) :
+                $oldProduct = $productService->get($oldProductId);
+                $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() + $oldSaleAmount);
+                $productService->update($oldProduct);
+            endif;
+
+            $product->setQuantidadeDisponivel($newQtd);
+            $productService->update($product);
         } catch (PDOException $e) {
             error_log('Erro ao atualizar venda: ' . $e->getMessage());
-            throw $e;
+            throw new Exception('Erro ao atualizar venda');
         }
     }
 
     public function get(int $id)
     {
         try {
-            $sql = "Select * from vendas where id = ? limit 1";
-            $conn = SaleService::getConexao();
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $id);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) :
-                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                $result =  $resultset[0];
-                return SaleService::ModelFromDBArray($result);
-            else :
-                return;
-            endif;
+            return $this->repository->get($id);
         } catch (\PDOException $e) {
-            error_log('Erro ao buscar compra: ' . $e->getMessage());
-            throw $e;
+            error_log('Erro ao buscar venda: ' . $e->getMessage());
+            throw new Exception('Erro ao buscar venda');
         }
     }
 
     public function list()
     {
         try {
-            $sql = "SELECT v.*, f.nome as nome_funcionario, c.nome as nome_cliente, 
-                    p.nome_produto as nome_produto FROM vendas v
-                    INNER JOIN funcionarios f
-                    on f.id = v.id_funcionario
-                    INNER JOIN clientes c
-                    on c.id = v.id_cliente
-                    INNER JOIN produtos p
-                    on p.id = v.id_produto
-                    order by data_venda desc";
-            $conn = SaleService::getConexao();
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) :
-                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                $result = [];
-                foreach ($resultset as $value) {
-                    array_push($result, SaleService::ModelFromDBArray($value));
-                }
-
-                return $result;
-
-            else :
-                return;
-            endif;
+            return $this->repository->list();
         } catch (\PDOException $e) {
             error_log('Erro ao listar vendas: ' . $e->getMessage());
-            throw $e;
+            throw new Exception('Erro ao listar vendas');
         }
     }
 
     public function listByUser($userId)
     {
         try {
-            $sql = "SELECT v.*, f.nome as nome_funcionario, c.nome as nome_cliente, 
-                    p.nome_produto as nome_produto FROM vendas v
-                    INNER JOIN funcionarios f
-                    on f.id = v.id_funcionario
-                    INNER JOIN clientes c
-                    on c.id = v.id_cliente
-                    INNER JOIN produtos p
-                    on p.id = v.id_produto
-                    WHERE v.id_funcionario = ?
-                    order by data_venda desc";
-            $conn = SaleService::getConexao();
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $userId);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) :
-                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                $result = [];
-                foreach ($resultset as $value) {
-                    array_push($result, SaleService::ModelFromDBArray($value));
-                }
-
-                return $result;
-
-            else :
-                return;
-            endif;
+            return $this->repository->listByUser($userId);
         } catch (\PDOException $e) {
             error_log('Erro ao listar vendas: ' . $e->getMessage());
-            throw $e;
+            throw new Exception('Erro ao listar vendas');
         }
     }
 
     public function listSalesByDay()
     {
         try {
-            $sql = "SELECT DATE_FORMAT(data_venda, '%d/%m/%Y') as data, 
-                    sum(valor_venda * quantidade_venda) as total 
-                    FROM `vendas`
-                    GROUP BY data
-                    ORDER BY data_venda ASC";
-            $conn = SaleService::getConexao();
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            if ($stmt->rowCount() > 0) :
-                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-                return $resultset;
-
-            else :
-                return;
-            endif;
+            return $this->repository->listSalesByDay();
         } catch (\PDOException $e) {
-            error_log('Erro ao listar vendas por dia: ' . $e->getMessage());
-            throw $e;
+            error_log('Erro ao listar vendas: ' . $e->getMessage());
+            throw new Exception('Erro ao listar vendas');
         }
     }
 
     public function remove(int $id)
     {
         try {
-            $sql = "DELETE FROM vendas WHERE id = ?";
-            $conn = SaleService::getConexao();
+            $sale = $this->get($id);
+            if (is_null($sale)) :
+                throw new Exception('Venda não encontrada');
+            endif;
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindValue(1, $id);
-            $stmt->execute();
-            $conn = null;
+            $this->validateEdit($sale) == false;
+
+            $this->repository->remove($id);
+
+            $productService = $this->service('ProductService');
+            $product = $productService->get($sale->getProductId());
+            $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() + $sale->getAmount());
+
+            $productService->update($product);
         } catch (\PDOException $e) {
             error_log('Erro ao remover venda: ' . $e->getMessage());
-            throw $e;
+            throw new Exception('Erro ao remover venda');
         }
     }
 }
