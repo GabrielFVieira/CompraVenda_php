@@ -29,8 +29,8 @@ class CategoryController extends BaseController
 
     public function index()
     {
-        $categoryModel = $this->model('CategoryModel');
-        $categories = $categoryModel->list();
+        $categoryRepository = $this->model('CategoryRepository');
+        $categories = $categoryRepository->list();
 
         $data = [
             'categories' => $categories
@@ -52,10 +52,10 @@ class CategoryController extends BaseController
 
             $category = new Category();
             $category->setNome($_POST['name']);
-            $categoryModel = $this->model('CategoryModel');
+            $categoryRepository = $this->model('CategoryRepository');
 
             try {
-                $categoryModel->create($category);
+                $categoryRepository->create($category);
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -79,8 +79,8 @@ class CategoryController extends BaseController
                 exit();
             }
 
-            $categoryModel = $this->model('CategoryModel');
-            $oldCategory = $categoryModel->get($path['id']);
+            $categoryRepository = $this->model('CategoryRepository');
+            $oldCategory = $categoryRepository->get($path['id']);
 
             if (is_null($oldCategory)) :
                 $errors = ['Categoria não encontrada'];
@@ -92,7 +92,7 @@ class CategoryController extends BaseController
             $oldCategory->setNome($_PUT['name']);
 
             try {
-                $categoryModel->update($oldCategory);
+                $categoryRepository->update($oldCategory);
                 Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -108,10 +108,10 @@ class CategoryController extends BaseController
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
             $id = $path['id'];
-            $categoryModel = $this->model('CategoryModel');
+            $categoryRepository = $this->model('CategoryRepository');
 
             try {
-                $category = $categoryModel->get($id);
+                $category = $categoryRepository->get($id);
 
                 if (!is_null($category)) :
                     Utils::jsonResponse(200, $category);
@@ -141,8 +141,8 @@ class CategoryController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $categoryModel = $this->model('CategoryModel');
-                $categoryModel->remove($id);
+                $categoryRepository = $this->model('CategoryRepository');
+                $categoryRepository->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover categoria'];

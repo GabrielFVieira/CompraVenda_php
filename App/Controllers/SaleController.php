@@ -34,14 +34,14 @@ class SaleController extends BaseController
 
     public function index()
     {
-        $saleModel = $this->model('SaleModel');
-        $sales = $saleModel->list();
+        $saleRepository = $this->model('SaleRepository');
+        $sales = $saleRepository->list();
 
-        $customerModel = $this->model('CustomerModel');
-        $customers = $customerModel->list();
+        $customerRepository = $this->model('CustomerRepository');
+        $customers = $customerRepository->list();
 
-        $productModel = $this->model('ProductModel');
-        $products = $productModel->listEnabledForSale();
+        $productRepository = $this->model('ProductRepository');
+        $products = $productRepository->listEnabledForSale();
 
         $data = [
             'sales' => $sales,
@@ -74,8 +74,8 @@ class SaleController extends BaseController
             return false;
         endif;
 
-        $customerModel = $this->model('CustomerModel');
-        $customer = $customerModel->get($sale->getClientId());
+        $customerRepository = $this->model('CustomerRepository');
+        $customer = $customerRepository->get($sale->getClientId());
 
         if (is_null($customer)) :
             $errors = ['Cliente não encontrado'];
@@ -102,8 +102,8 @@ class SaleController extends BaseController
             $this->updateModelValues($sale, $_POST);
             $sale->setDate(date("Y-m-d"));
 
-            $productModel = $this->model('ProductModel');
-            $product = $productModel->get($sale->getProductId());
+            $productRepository = $this->model('ProductRepository');
+            $product = $productRepository->get($sale->getProductId());
 
             if ($this->validateSale($sale, $product) == false) :
                 exit();
@@ -120,13 +120,13 @@ class SaleController extends BaseController
             $sale->setValue($product->getPrecoVenda());
 
             try {
-                $saleModel = $this->model('SaleModel');
-                $saleModel->create($sale);
+                $saleRepository = $this->model('SaleRepository');
+                $saleRepository->create($sale);
 
                 $newQtd = $product->getQuantidadeDisponivel() - $sale->getAmount();
                 $product->setQuantidadeDisponivel($newQtd);
 
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse();
             } catch (Exception $e) {
@@ -163,10 +163,10 @@ class SaleController extends BaseController
                 exit();
             }
 
-            $saleModel = $this->model('SaleModel');
-            $oldSale = $saleModel->get($path['id']);
+            $saleRepository = $this->model('SaleRepository');
+            $oldSale = $saleRepository->get($path['id']);
 
-            if (is_null($saleModel)) :
+            if (is_null($saleRepository)) :
                 $errors = ['Venda não encontrada'];
                 $data = ['errors' => $errors];
                 Utils::jsonResponse(500, $data);
@@ -182,8 +182,8 @@ class SaleController extends BaseController
 
             $this->updateModelValues($oldSale, $_PUT);
 
-            $productModel = $this->model('ProductModel');
-            $product = $productModel->get($oldSale->getProductId());
+            $productRepository = $this->model('ProductRepository');
+            $product = $productRepository->get($oldSale->getProductId());
 
             if ($this->validateSale($oldSale, $product) == false) :
                 exit();
@@ -204,16 +204,16 @@ class SaleController extends BaseController
             endif;
 
             try {
-                $saleModel->update($oldSale);
+                $saleRepository->update($oldSale);
 
                 if ($oldProductId != $product->getId()) :
-                    $oldProduct = $productModel->get($oldProductId);
+                    $oldProduct = $productRepository->get($oldProductId);
                     $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() + $oldSaleAmount);
-                    $productModel->update($oldProduct);
+                    $productRepository->update($oldProduct);
                 endif;
 
                 $product->setQuantidadeDisponivel($newQtd);
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse();
             } catch (Exception $e) {
@@ -229,10 +229,10 @@ class SaleController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $saleModel = $this->model('SaleModel');
+            $saleRepository = $this->model('SaleRepository');
 
             try {
-                $sale = $saleModel->get($path['id']);
+                $sale = $saleRepository->get($path['id']);
 
                 if (!is_null($sale)) :
                     Utils::jsonResponse(200, $sale);
@@ -260,9 +260,9 @@ class SaleController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $saleModel = $this->model('SaleModel');
+                $saleRepository = $this->model('SaleRepository');
 
-                $sale = $saleModel->get($id);
+                $sale = $saleRepository->get($id);
                 if (!is_null($sale)) :
                     if ($this->validateEdit($sale) == false) :
                         exit();
@@ -273,12 +273,12 @@ class SaleController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
 
-                $saleModel->remove($id);
+                $saleRepository->remove($id);
 
-                $productModel = $this->model('ProductModel');
-                $product = $productModel->get($sale->getProductId());
+                $productRepository = $this->model('ProductRepository');
+                $product = $productRepository->get($sale->getProductId());
                 $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() + $sale->getAmount());
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
@@ -299,8 +299,8 @@ class SaleController extends BaseController
             exit();
         endif;
 
-        $saleModel = $this->model('SaleModel');
-        $sales = $saleModel->listByUser($_SESSION['id']);
+        $saleRepository = $this->model('SaleRepository');
+        $sales = $saleRepository->listByUser($_SESSION['id']);
         Utils::jsonResponse(200, $sales);
     }
 }

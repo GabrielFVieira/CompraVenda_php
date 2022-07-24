@@ -45,8 +45,8 @@ class CustomerController extends BaseController
 
     public function index()
     {
-        $customerModel = $this->model('CustomerModel');
-        $customers = $customerModel->list();
+        $customerRepository = $this->model('CustomerRepository');
+        $customers = $customerRepository->list();
 
         $data = [
             'customers' => $customers
@@ -58,10 +58,10 @@ class CustomerController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $customerModel = $this->model('CustomerModel');
+            $customerRepository = $this->model('CustomerRepository');
 
             try {
-                $customer = $customerModel->get($path['id']);
+                $customer = $customerRepository->get($path['id']);
 
                 if (!is_null($customer)) :
                     Utils::jsonResponse(200, $customer);
@@ -111,8 +111,8 @@ class CustomerController extends BaseController
             $this->updateModelValues($customer, $_POST);
 
             try {
-                $customerModel = $this->model('CustomerModel');
-                $customerModel->create($customer);
+                $customerRepository = $this->model('CustomerRepository');
+                $customerRepository->create($customer);
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -136,8 +136,8 @@ class CustomerController extends BaseController
                 exit();
             }
 
-            $customerModel = $this->model('CustomerModel');
-            $oldCustomer = $customerModel->get($path['id']);
+            $customerRepository = $this->model('CustomerRepository');
+            $oldCustomer = $customerRepository->get($path['id']);
 
             if (is_null($oldCustomer)) :
                 $errors = ['Cliente não encontrado'];
@@ -149,7 +149,7 @@ class CustomerController extends BaseController
             $this->updateModelValues($oldCustomer, $_PUT);
 
             try {
-                $customerModel->update($oldCustomer);
+                $customerRepository->update($oldCustomer);
                 Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -170,8 +170,8 @@ class CustomerController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $customerModel = $this->model('CustomerModel');
-                $customerModel->remove($id);
+                $customerRepository = $this->model('CustomerRepository');
+                $customerRepository->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover cliente'];

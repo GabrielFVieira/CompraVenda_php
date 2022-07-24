@@ -36,11 +36,11 @@ class ProductController extends BaseController
 
     public function index()
     {
-        $productModel = $this->model('ProductModel');
-        $products = $productModel->list();
+        $productRepository = $this->model('ProductRepository');
+        $products = $productRepository->list();
 
-        $categoryModel = $this->model('CategoryModel');
-        $categories = $categoryModel->list();
+        $categoryRepository = $this->model('CategoryRepository');
+        $categories = $categoryRepository->list();
 
         $data = [
             'products' => $products,
@@ -80,10 +80,10 @@ class ProductController extends BaseController
 
             $product = new Product();
             $this->updateModelValues($product, $_POST);
-            $productModel = $this->model('ProductModel');
+            $productRepository = $this->model('ProductRepository');
 
             try {
-                $productModel->create($product);
+                $productRepository->create($product);
                 Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -107,8 +107,8 @@ class ProductController extends BaseController
                 exit();
             }
 
-            $productModel = $this->model('ProductModel');
-            $oldProduct = $productModel->get($path['id']);
+            $productRepository = $this->model('ProductRepository');
+            $oldProduct = $productRepository->get($path['id']);
 
             if (is_null($oldProduct)) :
                 $erros = ['Produto não encontrado'];
@@ -120,7 +120,7 @@ class ProductController extends BaseController
             $this->updateModelValues($oldProduct, $_PUT);
 
             try {
-                $productModel->update($oldProduct);
+                $productRepository->update($oldProduct);
                 Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -135,10 +135,10 @@ class ProductController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $productModel = $this->model('ProductModel');
+            $productRepository = $this->model('ProductRepository');
 
             try {
-                $product = $productModel->get($path['id']);
+                $product = $productRepository->get($path['id']);
 
                 if (!is_null($product)) :
                     Utils::jsonResponse(200, $product);
@@ -166,8 +166,8 @@ class ProductController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $productModel = $this->model('ProductModel');
-                $productModel->remove($id);
+                $productRepository = $this->model('ProductRepository');
+                $productRepository->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover produto'];

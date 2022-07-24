@@ -3,7 +3,7 @@
 use App\Core\BaseModel;
 use App\models\Employee;
 
-class EmployeeModel extends BaseModel
+class EmployeeRepository extends BaseModel
 {
     private static function ModelFromDBArray($array)
     {
@@ -21,7 +21,7 @@ class EmployeeModel extends BaseModel
     {
         try {
             $sql = "INSERT INTO funcionarios(nome,cpf,senha,papel) VALUES (?,?,?,?)";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $employee->getNome());
@@ -40,7 +40,7 @@ class EmployeeModel extends BaseModel
     {
         try {
             $sql = "Select * from funcionarios where id = ? limit 1";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -50,7 +50,7 @@ class EmployeeModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return EmployeeModel::ModelFromDBArray($result);
+                return EmployeeRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -64,7 +64,7 @@ class EmployeeModel extends BaseModel
     {
         try {
             $sql = "Select * from funcionarios where cpf = ? limit 1";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $cpf);
@@ -74,7 +74,7 @@ class EmployeeModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                 $result =  $resultset[0];
 
-                return EmployeeModel::ModelFromDBArray($result);
+                return EmployeeRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -87,7 +87,7 @@ class EmployeeModel extends BaseModel
     {
         try {
             $sql = "Select * from funcionarios order by nome";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -97,7 +97,7 @@ class EmployeeModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, EmployeeModel::ModelFromDBArray($value));
+                    array_push($result, EmployeeRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -114,7 +114,7 @@ class EmployeeModel extends BaseModel
     {
         try {
             $sql = "DELETE FROM funcionarios WHERE id = ?";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -133,7 +133,7 @@ class EmployeeModel extends BaseModel
                     nome = ?, cpf = ?, 
                     senha = ?, papel = ?
                     WHERE id = ?";
-            $conn = EmployeeModel::getConexao();
+            $conn = EmployeeRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $employee->getNome());

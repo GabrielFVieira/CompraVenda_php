@@ -3,7 +3,7 @@
 use App\Core\BaseModel;
 use App\models\Product;
 
-class ProductModel extends BaseModel
+class ProductRepository extends BaseModel
 {
     private static function ModelFromDBArray($array)
     {
@@ -29,7 +29,7 @@ class ProductModel extends BaseModel
         try {
             $sql = "INSERT INTO produtos(nome_produto,descricao,preco_compra,
                     preco_venda,quantidade_disponível,liberado_venda,id_categoria) VALUES (?,?,?,?,?,?,?)";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $product->getNome());
@@ -50,7 +50,7 @@ class ProductModel extends BaseModel
     {
         try {
             $sql = "Select * from produtos where id = ? limit 1";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -60,7 +60,7 @@ class ProductModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return ProductModel::ModelFromDBArray($result);
+                return ProductRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -78,7 +78,7 @@ class ProductModel extends BaseModel
                         ON c.id = p.id_categoria
                         WHERE p.liberado_venda = 'S'
                         ORDER BY p.nome_produto";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -88,7 +88,7 @@ class ProductModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, ProductModel::ModelFromDBArray($value));
+                    array_push($result, ProductRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -110,7 +110,7 @@ class ProductModel extends BaseModel
                         WHERE p.liberado_venda = 'S'
                         AND p.quantidade_disponível > 0
                         ORDER BY p.nome_produto";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -120,7 +120,7 @@ class ProductModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, ProductModel::ModelFromDBArray($value));
+                    array_push($result, ProductRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -140,7 +140,7 @@ class ProductModel extends BaseModel
                     INNER JOIN categorias c
                     ON c.id = p.id_categoria 
                     ORDER BY nome_produto";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -150,7 +150,7 @@ class ProductModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, ProductModel::ModelFromDBArray($value));
+                    array_push($result, ProductRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -172,7 +172,7 @@ class ProductModel extends BaseModel
                     quantidade_disponível = ?, liberado_venda = ?, 
                     id_categoria = ?
                     WHERE id = ?";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $product->getNome());
@@ -195,7 +195,7 @@ class ProductModel extends BaseModel
     {
         try {
             $sql = "DELETE FROM produtos WHERE id = ?";
-            $conn = ProductModel::getConexao();
+            $conn = ProductRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);

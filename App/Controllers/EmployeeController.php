@@ -37,8 +37,8 @@ class EmployeeController extends BaseController
 
     public function index()
     {
-        $employeeModel = $this->model('EmployeeModel');
-        $employees = $employeeModel->list();
+        $employeeRepository = $this->model('EmployeeRepository');
+        $employees = $employeeRepository->list();
 
         $data = [
             'employees' => $employees
@@ -50,10 +50,10 @@ class EmployeeController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $employeeModel = $this->model('EmployeeModel');
+            $employeeRepository = $this->model('EmployeeRepository');
 
             try {
-                $employee = $employeeModel->get($path['id']);
+                $employee = $employeeRepository->get($path['id']);
 
                 if (!is_null($employee)) :
                     $employees = Utils::omitPasswords($employee);
@@ -101,8 +101,8 @@ class EmployeeController extends BaseController
             $employee->setSenha(EmployeeController::DefaultPassword);
 
             try {
-                $employeeModel = $this->model('EmployeeModel');
-                $employeeModel->create($employee);
+                $employeeRepository = $this->model('EmployeeRepository');
+                $employeeRepository->create($employee);
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -126,8 +126,8 @@ class EmployeeController extends BaseController
                 exit();
             }
 
-            $employeeModel = $this->model('EmployeeModel');
-            $oldEmployee = $employeeModel->get($path['id']);
+            $employeeRepository = $this->model('EmployeeRepository');
+            $oldEmployee = $employeeRepository->get($path['id']);
 
             if (is_null($oldEmployee)) :
                 $errors = ['Funcionário não encontrado'];
@@ -139,7 +139,7 @@ class EmployeeController extends BaseController
             $this->updateModelValues($oldEmployee, $_PUT);
 
             try {
-                $employeeModel->update($oldEmployee);
+                $employeeRepository->update($oldEmployee);
                 Utils::jsonResponse();
             } catch (Exception $e) {
                 $errors = [$e->getMessage()];
@@ -160,8 +160,8 @@ class EmployeeController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $employeeModel = $this->model('EmployeeModel');
-                $employeeModel->remove($id);
+                $employeeRepository = $this->model('EmployeeRepository');
+                $employeeRepository->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
                 $errors = ['Erro ao remover funcionário'];

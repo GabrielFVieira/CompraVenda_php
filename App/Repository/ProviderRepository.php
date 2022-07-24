@@ -3,7 +3,7 @@
 use App\Core\BaseModel;
 use App\models\Provider;
 
-class ProviderModel extends BaseModel
+class ProviderRepository extends BaseModel
 {
     private static function ModelFromDBArray($array)
     {
@@ -27,7 +27,7 @@ class ProviderModel extends BaseModel
         try {
             $sql = "INSERT INTO fornecedores(razao_social,cnpj,endereco,
                     bairro,cidade,uf,cep,telefone,email) VALUES (?,?,?,?,?,?,?,?,?)";
-            $conn = ProviderModel::getConexao();
+            $conn = ProviderRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $provider->getRazaoSocial());
@@ -51,7 +51,7 @@ class ProviderModel extends BaseModel
     {
         try {
             $sql = "Select * from fornecedores where id = ? limit 1";
-            $conn = ProviderModel::getConexao();
+            $conn = ProviderRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -61,7 +61,7 @@ class ProviderModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return ProviderModel::ModelFromDBArray($result);
+                return ProviderRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -75,7 +75,7 @@ class ProviderModel extends BaseModel
     {
         try {
             $sql = "Select * from fornecedores order by razao_social";
-            $conn = ProviderModel::getConexao();
+            $conn = ProviderRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -85,7 +85,7 @@ class ProviderModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, ProviderModel::ModelFromDBArray($value));
+                    array_push($result, ProviderRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -102,7 +102,7 @@ class ProviderModel extends BaseModel
     {
         try {
             $sql = "DELETE FROM fornecedores WHERE id = ?";
-            $conn = ProviderModel::getConexao();
+            $conn = ProviderRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -124,7 +124,7 @@ class ProviderModel extends BaseModel
                     cep = ?, telefone = ?,
                     email = ?
                     WHERE id = ?";
-            $conn = ProviderModel::getConexao();
+            $conn = ProviderRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $provider->getRazaoSocial());

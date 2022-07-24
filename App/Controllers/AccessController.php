@@ -40,7 +40,7 @@ class AccessController extends BaseController
             }
 
             $senha_enviada = $_POST['password'];
-            $model = $this->model('EmployeeModel');
+            $model = $this->model('EmployeeRepository');
             $usuario = $model->getEmployeeByCPF($_POST['cpf']);
 
             if (!empty($usuario) && $senha_enviada == $usuario->getSenha()) :

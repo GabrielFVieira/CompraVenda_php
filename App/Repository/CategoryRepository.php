@@ -3,7 +3,7 @@
 use App\Core\BaseModel;
 use App\models\Category;
 
-class CategoryModel extends BaseModel
+class CategoryRepository extends BaseModel
 {
     private static function ModelFromDBArray($array)
     {
@@ -17,7 +17,7 @@ class CategoryModel extends BaseModel
     {
         try {
             $sql = "INSERT INTO categorias(nome_categoria) VALUES (?)";
-            $conn = CategoryModel::getConexao();
+            $conn = CategoryRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $category->getNome());
@@ -33,7 +33,7 @@ class CategoryModel extends BaseModel
     {
         try {
             $sql = "UPDATE categorias SET nome_categoria = ? WHERE id = ?";
-            $conn = CategoryModel::getConexao();
+            $conn = CategoryRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $category->getNome());
@@ -50,7 +50,7 @@ class CategoryModel extends BaseModel
     {
         try {
             $sql = "Select * from categorias where id = ? limit 1";
-            $conn = CategoryModel::getConexao();
+            $conn = CategoryRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -60,7 +60,7 @@ class CategoryModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return CategoryModel::ModelFromDBArray($result);
+                return CategoryRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -74,7 +74,7 @@ class CategoryModel extends BaseModel
     {
         try {
             $sql = "SELECT * from categorias";
-            $conn = CategoryModel::getConexao();
+            $conn = CategoryRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -84,7 +84,7 @@ class CategoryModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, CategoryModel::ModelFromDBArray($value));
+                    array_push($result, CategoryRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -101,7 +101,7 @@ class CategoryModel extends BaseModel
     {
         try {
             $sql = "DELETE FROM categorias WHERE id = ?";
-            $conn = CategoryModel::getConexao();
+            $conn = CategoryRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);

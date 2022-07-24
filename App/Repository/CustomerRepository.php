@@ -3,7 +3,7 @@
 use App\Core\BaseModel;
 use App\models\Customer;
 
-class CustomerModel extends BaseModel
+class CustomerRepository extends BaseModel
 {
     private static function ModelFromDBArray($array)
     {
@@ -27,7 +27,7 @@ class CustomerModel extends BaseModel
         try {
             $sql = "INSERT INTO clientes(nome,cpf,endereco,
                     bairro,cidade,uf,cep,telefone,email) VALUES (?,?,?,?,?,?,?,?,?)";
-            $conn = CustomerModel::getConexao();
+            $conn = CustomerRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $customer->getNome());
@@ -51,7 +51,7 @@ class CustomerModel extends BaseModel
     {
         try {
             $sql = "Select * from clientes where id = ? limit 1";
-            $conn = CustomerModel::getConexao();
+            $conn = CustomerRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -61,7 +61,7 @@ class CustomerModel extends BaseModel
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return CustomerModel::ModelFromDBArray($result);
+                return CustomerRepository::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -75,7 +75,7 @@ class CustomerModel extends BaseModel
     {
         try {
             $sql = "Select * from clientes order by nome";
-            $conn = CustomerModel::getConexao();
+            $conn = CustomerRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -85,7 +85,7 @@ class CustomerModel extends BaseModel
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, CustomerModel::ModelFromDBArray($value));
+                    array_push($result, CustomerRepository::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -102,7 +102,7 @@ class CustomerModel extends BaseModel
     {
         try {
             $sql = "DELETE FROM clientes WHERE id = ?";
-            $conn = CustomerModel::getConexao();
+            $conn = CustomerRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -124,7 +124,7 @@ class CustomerModel extends BaseModel
                     cep = ?, telefone = ?,
                     email = ?
                     WHERE id = ?";
-            $conn = CustomerModel::getConexao();
+            $conn = CustomerRepository::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $customer->getNome());

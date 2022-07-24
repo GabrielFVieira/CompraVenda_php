@@ -35,14 +35,14 @@ class PurchaseController extends BaseController
 
     public function index()
     {
-        $purchaseModel = $this->model('PurchaseModel');
-        $purchases = $purchaseModel->list();
+        $purchaseRepository = $this->model('PurchaseRepository');
+        $purchases = $purchaseRepository->list();
 
-        $providerModel = $this->model('ProviderModel');
-        $providers = $providerModel->list();
+        $providerRepository = $this->model('ProviderRepository');
+        $providers = $providerRepository->list();
 
-        $productModel = $this->model('ProductModel');
-        $products = $productModel->list();
+        $productRepository = $this->model('ProductRepository');
+        $products = $productRepository->list();
 
         $data = [
             'purchases' => $purchases,
@@ -77,8 +77,8 @@ class PurchaseController extends BaseController
             $this->updateModelValues($purchase, $_POST);
             $purchase->setData(date("Y-m-d"));
 
-            $productModel = $this->model('ProductModel');
-            $product = $productModel->get($purchase->getIdProduto());
+            $productRepository = $this->model('ProductRepository');
+            $product = $productRepository->get($purchase->getIdProduto());
 
             if (is_null($product)) :
                 $errors = ['Produto não encontrado'];
@@ -89,14 +89,14 @@ class PurchaseController extends BaseController
 
 
             try {
-                $purchaseModel = $this->model('PurchaseModel');
-                $purchaseModel->create($purchase);
+                $purchaseRepository = $this->model('PurchaseRepository');
+                $purchaseRepository->create($purchase);
 
                 $newQtd = $product->getQuantidadeDisponivel() + $purchase->getQuantidade();
                 $product->setQuantidadeDisponivel($newQtd);
                 $product->setPrecoCompra($purchase->getValor());
 
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse();
             } catch (Exception $e) {
@@ -134,8 +134,8 @@ class PurchaseController extends BaseController
                 exit();
             }
 
-            $purchaseModel = $this->model('PurchaseModel');
-            $oldPurchase = $purchaseModel->get($path['id']);
+            $purchaseRepository = $this->model('PurchaseRepository');
+            $oldPurchase = $purchaseRepository->get($path['id']);
 
             if (is_null($oldPurchase)) :
                 $errors = ['Compra não encontrada'];
@@ -154,8 +154,8 @@ class PurchaseController extends BaseController
 
             $this->updateModelValues($oldPurchase, $_PUT);
 
-            $productModel = $this->model('ProductModel');
-            $product = $productModel->get($oldPurchase->getIdProduto());
+            $productRepository = $this->model('ProductRepository');
+            $product = $productRepository->get($oldPurchase->getIdProduto());
 
             if (is_null($product)) :
                 $errors = ['Produto não encontrado'];
@@ -172,16 +172,16 @@ class PurchaseController extends BaseController
             endif;
 
             try {
-                $purchaseModel->update($oldPurchase);
+                $purchaseRepository->update($oldPurchase);
 
                 if ($oldProductId != $product->getId()) :
-                    $oldProduct = $productModel->get($oldProductId);
+                    $oldProduct = $productRepository->get($oldProductId);
                     $oldProduct->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel() - $oldPurchaseAmount);
-                    $productModel->update($oldProduct);
+                    $productRepository->update($oldProduct);
                 endif;
 
                 $product->setQuantidadeDisponivel($newQtd);
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse();
             } catch (Exception $e) {
@@ -197,10 +197,10 @@ class PurchaseController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $purchaseModel = $this->model('PurchaseModel');
+            $purchaseRepository = $this->model('PurchaseRepository');
 
             try {
-                $purchase = $purchaseModel->get($path['id']);
+                $purchase = $purchaseRepository->get($path['id']);
 
                 if (!is_null($purchase)) :
                     Utils::jsonResponse(200, $purchase);
@@ -228,9 +228,9 @@ class PurchaseController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $purchaseModel = $this->model('PurchaseModel');
+                $purchaseRepository = $this->model('PurchaseRepository');
 
-                $purchase = $purchaseModel->get($id);
+                $purchase = $purchaseRepository->get($id);
                 if (!is_null($purchase)) :
                     if ($this->validateEdit($purchase) == false) :
                         exit();
@@ -241,12 +241,12 @@ class PurchaseController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
 
-                $purchaseModel->remove($id);
+                $purchaseRepository->remove($id);
 
-                $productModel = $this->model('ProductModel');
-                $product = $productModel->get($purchase->getIdProduto());
+                $productRepository = $this->model('ProductRepository');
+                $product = $productRepository->get($purchase->getIdProduto());
                 $product->setQuantidadeDisponivel($product->getQuantidadeDisponivel() - $purchase->getQuantidade());
-                $productModel->update($product);
+                $productRepository->update($product);
 
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
@@ -267,8 +267,8 @@ class PurchaseController extends BaseController
             exit();
         endif;
 
-        $purchaseModel = $this->model('PurchaseModel');
-        $purchases = $purchaseModel->listByUser($_SESSION['id']);
+        $purchaseRepository = $this->model('PurchaseRepository');
+        $purchases = $purchaseRepository->listByUser($_SESSION['id']);
         Utils::jsonResponse(200, $purchases);
     }
 }

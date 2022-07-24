@@ -20,8 +20,8 @@ class DashboardController extends BaseController
     public function index()
     {
         if (!Utils::usuarioLogado()) :
-            $productModel = $this->model('ProductModel');
-            $products = $productModel->listEnabledForSaleWithAvailableAmount();
+            $productRepository = $this->model('ProductRepository');
+            $products = $productRepository->listEnabledForSaleWithAvailableAmount();
             $data = [
                 'products' => $products
             ];
@@ -51,11 +51,11 @@ class DashboardController extends BaseController
 
     private function getBuyerData()
     {
-        $providerModel = $this->model('ProviderModel');
-        $providers = $providerModel->list();
+        $providerRepository = $this->model('ProviderRepository');
+        $providers = $providerRepository->list();
 
-        $productModel = $this->model('ProductModel');
-        $products = $productModel->list();
+        $productRepository = $this->model('ProductRepository');
+        $products = $productRepository->list();
 
         $data = [
             'providers' => $providers,
@@ -67,11 +67,11 @@ class DashboardController extends BaseController
 
     private function getSellerData()
     {
-        $customerModel = $this->model('CustomerModel');
-        $customers = $customerModel->list();
+        $customerRepository = $this->model('CustomerRepository');
+        $customers = $customerRepository->list();
 
-        $productModel = $this->model('ProductModel');
-        $products = $productModel->listEnabledForSale();
+        $productRepository = $this->model('ProductRepository');
+        $products = $productRepository->listEnabledForSale();
 
         $data = [
             'customers' => $customers,
