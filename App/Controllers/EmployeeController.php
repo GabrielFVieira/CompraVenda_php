@@ -10,19 +10,17 @@ use App\models\Role;
 
 class EmployeeController extends BaseController
 {
-    const DefaultPassword = 'Suporte@22';
+    const DefaultPassword = Utils::DefaultPassword;
 
     protected $filters = [
         'name' => 'trim|sanitize_string',
         'cpf' => 'trim|sanitize_string',
-        // 'password' => 'trim|sanitize_string',
         'role' => 'trim|sanitize_string',
     ];
 
     protected $rules = [
         'name' => 'required|max_len,50',
         'cpf' => 'required|max_len,14',
-        // 'password' => 'required|max_len,10',
         'role' => 'required|integer|min_numeric,0|max_numeric,2',
     ];
 
@@ -37,8 +35,8 @@ class EmployeeController extends BaseController
 
     public function index()
     {
-        $employeeRepository = $this->model('EmployeeRepository');
-        $employees = $employeeRepository->list();
+        $employeeService = $this->service('EmployeeService');
+        $employees = $employeeService->list();
 
         $data = [
             'employees' => $employees
@@ -50,10 +48,10 @@ class EmployeeController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $employeeRepository = $this->model('EmployeeRepository');
+            $employeeService = $this->service('EmployeeService');
 
             try {
-                $employee = $employeeRepository->get($path['id']);
+                $employee = $employeeService->get($path['id']);
 
                 if (!is_null($employee)) :
                     $employees = Utils::omitPasswords($employee);
@@ -65,9 +63,7 @@ class EmployeeController extends BaseController
                     Utils::jsonResponse(404, $data);
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao buscar funcionário'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -79,10 +75,6 @@ class EmployeeController extends BaseController
         $model->setNome($data['name']);
         $model->setCPF($data['cpf']);
         $model->setPapel($data['role']);
-
-        // if (isset($data['password'])) :
-        //     $model->setSenha($data['password']);
-        // endif;
     }
 
     public function create()
@@ -96,18 +88,16 @@ class EmployeeController extends BaseController
                 exit();
             }
 
-            $employee = new Employee();
-            $this->updateModelValues($employee, $_POST);
-            $employee->setSenha(EmployeeController::DefaultPassword);
-
             try {
-                $employeeRepository = $this->model('EmployeeRepository');
-                $employeeRepository->create($employee);
+                $employee = new Employee();
+                $this->updateModelValues($employee, $_POST);
+
+                $employeeService = $this->service('EmployeeService');
+                $employeeService->create($employee);
+
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -126,25 +116,17 @@ class EmployeeController extends BaseController
                 exit();
             }
 
-            $employeeRepository = $this->model('EmployeeRepository');
-            $oldEmployee = $employeeRepository->get($path['id']);
-
-            if (is_null($oldEmployee)) :
-                $errors = ['Funcionário não encontrado'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(404, $data);
-                exit();
-            endif;
-
-            $this->updateModelValues($oldEmployee, $_PUT);
-
             try {
-                $employeeRepository->update($oldEmployee);
+                $employee = new Employee();
+                $this->updateModelValues($employee, $_PUT);
+                $employee->setId($path['id']);
+
+                $employeeService = $this->service('EmployeeService');
+                $employeeService->update($employee);
+
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -160,13 +142,12 @@ class EmployeeController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $employeeRepository = $this->model('EmployeeRepository');
-                $employeeRepository->remove($id);
+                $employeeService = $this->service('EmployeeService');
+                $employeeService->remove($id);
+
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
-                $errors = ['Erro ao remover funcionário'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();

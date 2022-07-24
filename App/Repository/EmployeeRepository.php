@@ -1,9 +1,9 @@
 <?php
 
-use App\Core\BaseModel;
+use App\Core\BaseRepository;
 use App\models\Employee;
 
-class EmployeeRepository extends BaseModel
+class EmployeeRepository extends BaseRepository
 {
     private static function ModelFromDBArray($array)
     {
@@ -79,7 +79,8 @@ class EmployeeRepository extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            die('Query failed: ' . $e->getMessage());
+            error_log('Erro ao buscar functionário: ' . $e->getMessage());
+            throw $e;
         }
     }
 

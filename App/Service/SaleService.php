@@ -3,7 +3,7 @@
 use App\Core\BaseRepository;
 use App\models\Sale;
 
-class SaleRepository extends BaseRepository
+class SaleService extends BaseRepository
 {
     private static function ModelFromDBArray($array)
     {
@@ -36,7 +36,7 @@ class SaleRepository extends BaseRepository
         try {
             $sql = "INSERT INTO vendas(quantidade_venda,data_venda,valor_venda,
                     id_cliente,id_produto,id_funcionario) VALUES (?,?,?,?,?,?)";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $sale->getAmount());
@@ -61,7 +61,7 @@ class SaleRepository extends BaseRepository
                     valor_venda = ?, id_cliente = ?,
                     id_produto = ?, id_funcionario = ?
                     WHERE id = ?";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $sale->getAmount());
@@ -83,7 +83,7 @@ class SaleRepository extends BaseRepository
     {
         try {
             $sql = "Select * from vendas where id = ? limit 1";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -93,7 +93,7 @@ class SaleRepository extends BaseRepository
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return SaleRepository::ModelFromDBArray($result);
+                return SaleService::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -115,7 +115,7 @@ class SaleRepository extends BaseRepository
                     INNER JOIN produtos p
                     on p.id = v.id_produto
                     order by data_venda desc";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -125,7 +125,7 @@ class SaleRepository extends BaseRepository
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, SaleRepository::ModelFromDBArray($value));
+                    array_push($result, SaleService::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -152,7 +152,7 @@ class SaleRepository extends BaseRepository
                     on p.id = v.id_produto
                     WHERE v.id_funcionario = ?
                     order by data_venda desc";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $userId);
@@ -163,7 +163,7 @@ class SaleRepository extends BaseRepository
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, SaleRepository::ModelFromDBArray($value));
+                    array_push($result, SaleService::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -185,7 +185,7 @@ class SaleRepository extends BaseRepository
                     FROM `vendas`
                     GROUP BY data
                     ORDER BY data_venda ASC";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -208,7 +208,7 @@ class SaleRepository extends BaseRepository
     {
         try {
             $sql = "DELETE FROM vendas WHERE id = ?";
-            $conn = SaleRepository::getConexao();
+            $conn = SaleService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);

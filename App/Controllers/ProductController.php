@@ -36,11 +36,11 @@ class ProductController extends BaseController
 
     public function index()
     {
-        $productRepository = $this->model('ProductRepository');
-        $products = $productRepository->list();
+        $productService = $this->service('ProductService');
+        $products = $productService->list();
 
-        $categoryRepository = $this->model('CategoryRepository');
-        $categories = $categoryRepository->list();
+        $categoryService = $this->service('CategoryService');
+        $categories = $categoryService->list();
 
         $data = [
             'products' => $products,
@@ -78,17 +78,16 @@ class ProductController extends BaseController
                 exit();
             }
 
-            $product = new Product();
-            $this->updateModelValues($product, $_POST);
-            $productRepository = $this->model('ProductRepository');
-
             try {
-                $productRepository->create($product);
+                $product = new Product();
+                $this->updateModelValues($product, $_POST);
+
+                $productService = $this->service('ProductService');
+                $productService->create($product);
+
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -107,25 +106,17 @@ class ProductController extends BaseController
                 exit();
             }
 
-            $productRepository = $this->model('ProductRepository');
-            $oldProduct = $productRepository->get($path['id']);
-
-            if (is_null($oldProduct)) :
-                $erros = ['Produto não encontrado'];
-                $data = ['erros' => $erros];
-                Utils::redirect('products', $data);
-                exit();
-            endif;
-
-            $this->updateModelValues($oldProduct, $_PUT);
-
             try {
-                $productRepository->update($oldProduct);
+                $product = new Product();
+                $this->updateModelValues($product, $_PUT);
+                $product->setId($path['id']);
+
+                $productService = $this->service('ProductService');
+                $productService->update($product);
+
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -135,22 +126,18 @@ class ProductController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $productRepository = $this->model('ProductRepository');
+            $productService = $this->service('ProductService');
 
             try {
-                $product = $productRepository->get($path['id']);
+                $product = $productService->get($path['id']);
 
                 if (!is_null($product)) :
                     Utils::jsonResponse(200, $product);
                 else :
-                    $errors = ['Produto não encontrado'];
-                    $data = ['errors' => $errors];
-                    Utils::jsonResponse(404, $data);
+                    Utils::returnJsonError(404, 'Produto não encontrado');
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao buscar produto'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -166,13 +153,12 @@ class ProductController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $productRepository = $this->model('ProductRepository');
-                $productRepository->remove($id);
+                $productService = $this->service('ProductService');
+                $productService->remove($id);
+
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
-                $errors = ['Erro ao remover produto'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();

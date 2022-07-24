@@ -1,9 +1,9 @@
 <?php
 
-use App\Core\BaseModel;
+use App\Core\BaseRepository;
 use App\models\Product;
 
-class ProductRepository extends BaseModel
+class ProductRepository extends BaseRepository
 {
     private static function ModelFromDBArray($array)
     {

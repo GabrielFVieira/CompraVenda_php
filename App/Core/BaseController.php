@@ -4,14 +4,13 @@ namespace App\Core;
 
 class BaseController
 {
-
-    public function model($model)
+    public function service($model)
     {
-        if (file_exists('App/Repository/' . $model . '.php')) :
-            require_once 'App/Repository/' . $model . '.php';
+        if (file_exists('App/Service/' . $model . '.php')) :
+            require_once 'App/Service/' . $model . '.php';
             return new $model;
         else :
-            echo "Model not found";
+            echo "Service not found";
         endif;
     }
 

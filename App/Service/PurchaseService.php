@@ -3,7 +3,7 @@
 use App\Core\BaseRepository;
 use App\models\Purchase;
 
-class PurchaseRepository extends BaseRepository
+class PurchaseService extends BaseRepository
 {
     private static function ModelFromDBArray($array)
     {
@@ -36,7 +36,7 @@ class PurchaseRepository extends BaseRepository
         try {
             $sql = "INSERT INTO compras(quantidade_compra,data_compra,valor_compra,
                     id_fornecedor,id_produto,id_funcionario) VALUES (?,?,?,?,?,?)";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $purchase->getQuantidade());
@@ -61,7 +61,7 @@ class PurchaseRepository extends BaseRepository
                     valor_compra = ?, id_fornecedor = ?,
                     id_produto = ?, id_funcionario = ?
                     WHERE id = ?";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $purchase->getQuantidade());
@@ -83,7 +83,7 @@ class PurchaseRepository extends BaseRepository
     {
         try {
             $sql = "Select * from compras where id = ? limit 1";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);
@@ -93,7 +93,7 @@ class PurchaseRepository extends BaseRepository
                 $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
                 $result =  $resultset[0];
-                return PurchaseRepository::ModelFromDBArray($result);
+                return PurchaseService::ModelFromDBArray($result);
             else :
                 return;
             endif;
@@ -115,7 +115,7 @@ class PurchaseRepository extends BaseRepository
                     INNER JOIN produtos p
                     on p.id = c.id_produto
                     order by data_compra desc";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -125,7 +125,7 @@ class PurchaseRepository extends BaseRepository
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, PurchaseRepository::ModelFromDBArray($value));
+                    array_push($result, PurchaseService::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -152,7 +152,7 @@ class PurchaseRepository extends BaseRepository
                     on p.id = c.id_produto
                     WHERE c.id_funcionario = ?
                     order by data_compra desc";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $userId);
@@ -163,7 +163,7 @@ class PurchaseRepository extends BaseRepository
 
                 $result = [];
                 foreach ($resultset as $value) {
-                    array_push($result, PurchaseRepository::ModelFromDBArray($value));
+                    array_push($result, PurchaseService::ModelFromDBArray($value));
                 }
 
                 return $result;
@@ -181,7 +181,7 @@ class PurchaseRepository extends BaseRepository
     {
         try {
             $sql = "DELETE FROM compras WHERE id = ?";
-            $conn = PurchaseRepository::getConexao();
+            $conn = PurchaseService::getConexao();
 
             $stmt = $conn->prepare($sql);
             $stmt->bindValue(1, $id);

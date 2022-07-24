@@ -5,7 +5,7 @@ namespace App\Core;
 use \PDO;
 use \PDOException;
 
-class BaseModel
+class BaseRepository
 {
     private const options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

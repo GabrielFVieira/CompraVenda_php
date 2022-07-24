@@ -1,9 +1,9 @@
 <?php
 
-use App\Core\BaseModel;
+use App\Core\BaseRepository;
 use App\models\Category;
 
-class CategoryRepository extends BaseModel
+class CategoryRepository extends BaseRepository
 {
     private static function ModelFromDBArray($array)
     {
@@ -24,7 +24,6 @@ class CategoryRepository extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            error_log('Erro ao cadastrar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -41,7 +40,6 @@ class CategoryRepository extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (PDOException $e) {
-            error_log('Erro ao atualizar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -65,7 +63,6 @@ class CategoryRepository extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            error_log('Erro ao buscar categoria: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -92,7 +89,6 @@ class CategoryRepository extends BaseModel
                 return;
             endif;
         } catch (\PDOException $e) {
-            error_log('Erro ao listar categorias: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -108,7 +104,6 @@ class CategoryRepository extends BaseModel
             $stmt->execute();
             $conn = null;
         } catch (\PDOException $e) {
-            error_log('Erro ao remover categoria: ' . $e->getMessage());
             throw $e;
         }
     }

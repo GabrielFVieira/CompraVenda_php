@@ -29,8 +29,8 @@ class CategoryController extends BaseController
 
     public function index()
     {
-        $categoryRepository = $this->model('CategoryRepository');
-        $categories = $categoryRepository->list();
+        $categoryService = $this->service('CategoryService');
+        $categories = $categoryService->list();
 
         $data = [
             'categories' => $categories
@@ -50,17 +50,16 @@ class CategoryController extends BaseController
                 exit();
             }
 
-            $category = new Category();
-            $category->setNome($_POST['name']);
-            $categoryRepository = $this->model('CategoryRepository');
-
             try {
-                $categoryRepository->create($category);
+                $category = new Category();
+                $category->setNome($_POST['name']);
+
+                $categoryService = $this->service('CategoryService');
+                $categoryService->create($category);
+
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -79,25 +78,17 @@ class CategoryController extends BaseController
                 exit();
             }
 
-            $categoryRepository = $this->model('CategoryRepository');
-            $oldCategory = $categoryRepository->get($path['id']);
-
-            if (is_null($oldCategory)) :
-                $errors = ['Categoria não encontrada'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(404, $data);
-                exit();
-            endif;
-
-            $oldCategory->setNome($_PUT['name']);
-
             try {
-                $categoryRepository->update($oldCategory);
+                $category = new Category();
+                $category->setId($path['id']);
+                $category->setNome($_PUT['name']);
+
+                $categoryService = $this->service('CategoryService');
+                $categoryService->update($category);
+
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -107,23 +98,18 @@ class CategoryController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $id = $path['id'];
-            $categoryRepository = $this->model('CategoryRepository');
-
             try {
-                $category = $categoryRepository->get($id);
+                $id = $path['id'];
+                $categoryService = $this->service('CategoryService');
+                $category = $categoryService->get($id);
 
                 if (!is_null($category)) :
                     Utils::jsonResponse(200, $category);
                 else :
-                    $errors = ['Categoria não encontrada'];
-                    $data = ['errors' => $errors];
-                    Utils::jsonResponse(404, $data);
+                    Utils::returnJsonError(404, 'Categoria não encontrada');
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao buscar categoria'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();
@@ -141,13 +127,11 @@ class CategoryController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $categoryRepository = $this->model('CategoryRepository');
-                $categoryRepository->remove($id);
+                $categoryService = $this->service('CategoryService');
+                $categoryService->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
-                $errors = ['Erro ao remover categoria'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();

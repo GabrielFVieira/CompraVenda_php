@@ -8,6 +8,8 @@ use App\models\Role;
 
 class Utils
 {
+    const DefaultPassword = 'Suporte@22';
+
     public static function gerarTokenCSRF()
     {
         $string_aleatoria = bin2hex(openssl_random_pseudo_bytes(16));
@@ -41,6 +43,12 @@ class Utils
         else :
             echo json_encode(array());
         endif;
+    }
+
+    public static function returnJsonError(int $status, string ...$errors)
+    {
+        $data = ['errors' => $errors];
+        Utils::jsonResponse($status, $data);
     }
 
     public static function loadPutValues(&$variable)

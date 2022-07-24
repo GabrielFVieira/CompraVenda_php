@@ -21,15 +21,15 @@ class ReportController extends BaseController
 
     public function products()
     {
-        $productRepository = $this->model('ProductRepository');
-        $products = $productRepository->list();
+        $productService = $this->service('ProductService');
+        $products = $productService->list();
         Utils::jsonResponse(200, $products);
     }
 
     public function sales()
     {
-        $saleRepository = $this->model('SaleRepository');
-        $sales = $saleRepository->listSalesByDay();
+        $saleService = $this->service('SaleService');
+        $sales = $saleService->listSalesByDay();
         Utils::jsonResponse(200, $sales);
     }
 }

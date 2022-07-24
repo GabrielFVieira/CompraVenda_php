@@ -45,8 +45,8 @@ class ProviderController extends BaseController
 
     public function index()
     {
-        $providerRepository = $this->model('ProviderRepository');
-        $providers = $providerRepository->list();
+        $providerService = $this->service('ProviderService');
+        $providers = $providerService->list();
 
         $data = [
             'providers' => $providers
@@ -58,22 +58,18 @@ class ProviderController extends BaseController
     public function find($path)
     {
         if ($_SERVER['REQUEST_METHOD'] == 'GET') :
-            $providerRepository = $this->model('ProviderRepository');
+            $providerService = $this->service('ProviderService');
 
             try {
-                $provider = $providerRepository->get($path['id']);
+                $provider = $providerService->get($path['id']);
 
                 if (!is_null($provider)) :
                     Utils::jsonResponse(200, $provider);
                 else :
-                    $errors = ['Fornecedor não encontrado'];
-                    $data = ['errors' => $errors];
-                    Utils::jsonResponse(404, $data);
+                    Utils::returnJsonError(404, 'Fornecedor não encontrado');
                 endif;
             } catch (Exception $e) {
-                $errors = ['Erro ao buscar fornecedor'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -104,17 +100,15 @@ class ProviderController extends BaseController
                 exit();
             }
 
-            $provider = new Provider();
-            $this->updateModelValues($provider, $_POST);
-
             try {
-                $providerRepository = $this->model('ProviderRepository');
-                $providerRepository->create($provider);
+                $provider = new Provider();
+                $this->updateModelValues($provider, $_POST);
+
+                $providerService = $this->service('ProviderService');
+                $providerService->create($provider);
                 Utils::jsonResponse(201);
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::redirect();
@@ -133,25 +127,16 @@ class ProviderController extends BaseController
                 exit();
             }
 
-            $providerRepository = $this->model('ProviderRepository');
-            $oldProvider = $providerRepository->get($path['id']);
-
-            if (is_null($oldProvider)) :
-                $errors = ['Fornecedor não encontrado'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(404, $data);
-                exit();
-            endif;
-
-            $this->updateModelValues($oldProvider, $_PUT);
-
             try {
-                $providerRepository->update($oldProvider);
+                $provider = new Provider();
+                $this->updateModelValues($provider, $_PUT);
+                $provider->setId($path['id']);
+
+                $providerService = $this->service('ProviderService');
+                $providerService->update($provider);
                 Utils::jsonResponse();
             } catch (Exception $e) {
-                $errors = [$e->getMessage()];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
         else :
             Utils::jsonResponse(405);
@@ -167,13 +152,11 @@ class ProviderController extends BaseController
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') :
             try {
                 $id = $data['id'];
-                $providerRepository = $this->model('ProviderRepository');
-                $providerRepository->remove($id);
+                $providerService = $this->service('ProviderService');
+                $providerService->remove($id);
                 Utils::jsonResponse(204);
             } catch (Exception $e) {
-                $errors = ['Erro ao remover fornecedor'];
-                $data = ['errors' => $errors];
-                Utils::jsonResponse(500, $data);
+                Utils::returnJsonError(500, $e->getMessage());
             }
 
             exit();
