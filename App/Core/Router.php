@@ -31,6 +31,7 @@ $route->post("/sales", "SaleController:create");
 $route->get("/sales/{id}", "SaleController:find");
 $route->put("/sales/{id}", "SaleController:update");
 $route->delete("/sales/{id}", "SaleController:remove");
+$route->get("/my/sales", "SaleController:listByUser");
 
 $route->get("/products", "ProductController:index");
 $route->post("/products", "ProductController:create");
@@ -43,6 +44,7 @@ $route->post("/purchases", "PurchaseController:create");
 $route->get("/purchases/{id}", "PurchaseController:find");
 $route->put("/purchases/{id}", "PurchaseController:update");
 $route->delete("/purchases/{id}", "PurchaseController:remove");
+$route->get("/my/purchases", "PurchaseController:listByUser");
 
 $route->get("/categories", "CategoryController:index");
 $route->post("/categories", "CategoryController:create");

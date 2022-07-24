@@ -139,6 +139,44 @@ class PurchaseModel extends BaseModel
         }
     }
 
+    public function listByUser($userId)
+    {
+        try {
+            $sql = "SELECT c.*, f.nome as nome_funcionario, f2.razao_social as fornecedor, 
+                    p.nome_produto as nome_produto FROM compras c
+                    INNER JOIN funcionarios f
+                    on f.id = c.id_funcionario
+                    INNER JOIN fornecedores f2
+                    on f2.id = c.id_fornecedor
+                    INNER JOIN produtos p
+                    on p.id = c.id_produto
+                    WHERE c.id_funcionario = ?
+                    order by data_compra desc";
+            $conn = PurchaseModel::getConexao();
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(1, $userId);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) :
+                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, PurchaseModel::ModelFromDBArray($value));
+                }
+
+                return $result;
+
+            else :
+                return;
+            endif;
+        } catch (\PDOException $e) {
+            error_log('Erro ao listar compras: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function remove(int $id)
     {
         try {

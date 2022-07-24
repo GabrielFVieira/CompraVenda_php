@@ -260,4 +260,15 @@ class PurchaseController extends BaseController
             Utils::redirect();
         endif;
     }
+
+    public function listByUser()
+    {
+        if (Utils::hasPermission(Role::Comprador) == false) :
+            exit();
+        endif;
+
+        $purchaseModel = $this->model('PurchaseModel');
+        $purchases = $purchaseModel->listByUser($_SESSION['id']);
+        Utils::jsonResponse(200, $purchases);
+    }
 }

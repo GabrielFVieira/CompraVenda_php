@@ -292,4 +292,15 @@ class SaleController extends BaseController
             Utils::redirect();
         endif;
     }
+
+    public function listByUser()
+    {
+        if (Utils::hasPermission(Role::Vendedor) == false) :
+            exit();
+        endif;
+
+        $saleModel = $this->model('SaleModel');
+        $sales = $saleModel->listByUser($_SESSION['id']);
+        Utils::jsonResponse(200, $sales);
+    }
 }

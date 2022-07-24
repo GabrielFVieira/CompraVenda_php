@@ -139,6 +139,44 @@ class SaleModel extends BaseModel
         }
     }
 
+    public function listByUser($userId)
+    {
+        try {
+            $sql = "SELECT v.*, f.nome as nome_funcionario, c.nome as nome_cliente, 
+                    p.nome_produto as nome_produto FROM vendas v
+                    INNER JOIN funcionarios f
+                    on f.id = v.id_funcionario
+                    INNER JOIN clientes c
+                    on c.id = v.id_cliente
+                    INNER JOIN produtos p
+                    on p.id = v.id_produto
+                    WHERE v.id_funcionario = ?
+                    order by data_venda desc";
+            $conn = SaleModel::getConexao();
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bindValue(1, $userId);
+            $stmt->execute();
+
+            if ($stmt->rowCount() > 0) :
+                $resultset = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+                $result = [];
+                foreach ($resultset as $value) {
+                    array_push($result, SaleModel::ModelFromDBArray($value));
+                }
+
+                return $result;
+
+            else :
+                return;
+            endif;
+        } catch (\PDOException $e) {
+            error_log('Erro ao listar vendas: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     public function listSalesByDay()
     {
         try {
