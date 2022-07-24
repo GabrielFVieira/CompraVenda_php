@@ -77,11 +77,16 @@ $(document).ready(function() {
         success: function(data) {
             parsedData = JSON.parse(data);
 
+            const formatter = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+
             const table = $("#salesTable tbody");
             $.each(parsedData, function(idx, elem) {
-                table.append("<tr><td>" + elem.data + "</td><td>R$" + Math.round(elem
-                        .total *
-                        100) / 100 +
+                table.append(
+                    "<tr><td>" + elem.data +
+                    "</td><td>" + formatter.format(elem.total) +
                     "</td></tr>");
             });
 

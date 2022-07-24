@@ -44,7 +44,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                                         <td><?= $sale->getEmployeeName() ?></td>
                                         <td><?= date_format($date, 'd/m/Y') ?></td>
                                         <td><?= $sale->getAmount() ?></td>
-                                        <td>R$<?= $sale->getValue() ?></td>
+                                        <td>R$<?= $sale->getFormattedValue() ?></td>
                                         <td class="text-right">
                                             <?php
                                             if (

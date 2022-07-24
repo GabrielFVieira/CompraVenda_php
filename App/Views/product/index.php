@@ -41,8 +41,8 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                                     <tr>
                                         <td><?= $product->getNome() ?></td>
                                         <td><?= $product->getDescricao() ?></td>
-                                        <td>R$<?= $product->getPrecoCompra() ?></td>
-                                        <td>R$<?= $product->getPrecoVenda() ?></td>
+                                        <td>R$<?= $product->getPrecoCompraFormatado() ?></td>
+                                        <td>R$<?= $product->getPrecoVendaFormatado() ?></td>
                                         <td><?= $product->getQuantidadeDisponivel() ?></td>
                                         <td><?= $product->getNomeCategoria() ?></td>
                                         <td><?= $product->getLiberadoVenda() ?></td>

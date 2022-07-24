@@ -103,4 +103,9 @@ class Utils
 
         return $params;
     }
+
+    public static function getFloatAsCurrency($value)
+    {
+        return number_format($value, 2, ',', '.');
+    }
 }

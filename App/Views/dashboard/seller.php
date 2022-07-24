@@ -101,12 +101,18 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                 success: function(data) {
                     parsedData = JSON.parse(data);
 
+                    const formatter = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+
                     const table = $("#salesTable tbody");
                     $.each(parsedData, function(idx, elem) {
-                        table.append("<tr><td>" + elem.productName + "</td><td>" + elem.date +
+                        table.append(
+                            "<tr><td>" + elem.productName +
+                            "</td><td>" + elem.date +
                             "</td><td>" + elem.amount +
-                            "</td><td>R$" + Math.round(parseFloat(elem.value) * 100) /
-                            100 +
+                            "</td><td>" + formatter.format(parseFloat(elem.value)) +
                             "</td></tr>");
                     });
 

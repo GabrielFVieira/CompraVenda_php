@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use app\utils\Utils;
+
 class Product implements \JsonSerializable
 {
     private $id, $nome, $descricao, $precoCompra, $precoVenda,
@@ -58,6 +60,11 @@ class Product implements \JsonSerializable
         return $this->precoCompra;
     }
 
+    public function getPrecoCompraFormatado()
+    {
+        return Utils::getFloatAsCurrency($this->precoCompra);
+    }
+
     public function setPrecoCompra(float $preco)
     {
         $this->precoCompra = $preco;
@@ -66,6 +73,11 @@ class Product implements \JsonSerializable
     public function getPrecoVenda()
     {
         return $this->precoVenda;
+    }
+
+    public function getPrecoVendaFormatado()
+    {
+        return Utils::getFloatAsCurrency($this->precoVenda);
     }
 
     public function setPrecoVenda(float $preco)

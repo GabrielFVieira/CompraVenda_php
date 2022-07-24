@@ -45,7 +45,7 @@ if (isset($_SESSION['id']) && isset($_SESSION['nomeUsuario'])) : ?>
                                         <td><?= $purchase->getNomeFuncionario() ?></td>
                                         <td><?= date_format($date, 'd/m/Y') ?></td>
                                         <td><?= $purchase->getQuantidade() ?></td>
-                                        <td>R$<?= $purchase->getValor() ?></td>
+                                        <td>R$<?= $purchase->getValorFormatado() ?></td>
                                         <td class="text-right">
                                             <?php
                                             if (

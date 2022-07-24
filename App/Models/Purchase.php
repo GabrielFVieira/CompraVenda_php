@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use app\utils\Utils;
+
 class Purchase implements \JsonSerializable
 {
     private $id, $quantidadeCompra, $valorCompra, $idFornecedor, $nomeFornecedor,
@@ -44,6 +46,11 @@ class Purchase implements \JsonSerializable
     public function getValor()
     {
         return $this->valorCompra;
+    }
+
+    public function getValorFormatado()
+    {
+        return Utils::getFloatAsCurrency($this->valorCompra);
     }
 
     public function setValor($valor)

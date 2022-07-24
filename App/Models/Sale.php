@@ -2,6 +2,8 @@
 
 namespace App\models;
 
+use app\utils\Utils;
+
 class Sale implements \JsonSerializable
 {
     private $id, $amount, $date, $value, $clientId, $clientName,
@@ -54,6 +56,11 @@ class Sale implements \JsonSerializable
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function getFormattedValue()
+    {
+        return Utils::getFloatAsCurrency($this->value);
     }
 
     public function setValue(float $value)
