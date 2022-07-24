@@ -112,6 +112,15 @@ class ProductController extends BaseController
                 $product->setId($path['id']);
 
                 $productService = $this->service('ProductService');
+
+                $oldProduct = $productService->get($product->getId());
+                if (is_null($oldProduct)) :
+                    throw new Exception('Produto não encontrado');
+                endif;
+
+                $product->setQuantidadeDisponivel($oldProduct->getQuantidadeDisponivel());
+                $product->setPrecoCompra($oldProduct->getPrecoCompra());
+
                 $productService->update($product);
 
                 Utils::jsonResponse();
