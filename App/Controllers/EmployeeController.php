@@ -122,6 +122,14 @@ class EmployeeController extends BaseController
                 $employee->setId($path['id']);
 
                 $employeeService = $this->service('EmployeeService');
+
+                $oldEmployee = $employeeService->get($employee->getId());
+                if (is_null($oldEmployee)) :
+                    throw new Exception('Funcionário não encontrado');
+                endif;
+
+                $employee->setSenha($oldEmployee->getSenha());
+
                 $employeeService->update($employee);
 
                 Utils::jsonResponse();
